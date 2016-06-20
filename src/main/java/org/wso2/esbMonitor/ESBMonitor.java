@@ -24,10 +24,7 @@ import org.wso2.esbMonitor.connector.DBConnector;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.persistance.PersistenceService;
 import org.wso2.esbMonitor.pingReceiver.PingHandler;
-import org.wso2.esbMonitor.tasks.DBCleanerTask;
-import org.wso2.esbMonitor.tasks.DBTaskRunner;
-import org.wso2.esbMonitor.tasks.JVMTaskRunner;
-import org.wso2.esbMonitor.tasks.NetworkMonitor;
+import org.wso2.esbMonitor.tasks.*;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -54,6 +51,7 @@ public class ESBMonitor {
          *  3)Persistence service
          *  4)Clean database tables
          *  5)Ping receiver
+         *  6)ESB status monitor
          *  */
 
         new JVMTaskRunner().start();
@@ -61,6 +59,7 @@ public class ESBMonitor {
         new DBTaskRunner().start();
         new DBCleanerTask().start();
         new PingHandler().start();
+        new ESBStatusCheckerTask().start();
 //        MBeanServerConnection remote = RemoteConnector.getRemote();
 //        try {
 //            ObjectName bean = new ObjectName("org.apache.synapse:Type=Transport,Name=passthru-http-receiver");

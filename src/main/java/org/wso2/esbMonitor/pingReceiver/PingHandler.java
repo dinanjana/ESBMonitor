@@ -31,19 +31,22 @@ import java.net.InetSocketAddress;
  * Created by Dinanjana on 19/06/2016.
  */
 public class PingHandler extends Thread{
-    private Logger logger = Logger.getLogger(PingHandler.class);
+    private static Logger logger = Logger.getLogger(PingHandler.class);
     private static int PORT = 9090;
+    private static long lastUpdatedTime=0;
 
     private static void initPingReceiver() throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
         server.createContext("/ping", new MyHandler());
         server.setExecutor(null); // creates a default executor
         server.start();
+        logger.info("Ping server started");
     }
 
     static class MyHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
+            lastUpdatedTime = System.currentTimeMillis();
             String response = "Ping received";
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
@@ -61,5 +64,12 @@ public class PingHandler extends Thread{
         }
     }
 
+    public static void setPORT(int PORT) {
+        PingHandler.PORT = PORT;
+    }
+
+    public static long getLastUpdatedTime(){
+        return lastUpdatedTime;
+    }
 
 }

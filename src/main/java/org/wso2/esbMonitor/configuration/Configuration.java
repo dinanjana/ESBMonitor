@@ -26,10 +26,9 @@ import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
 import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
 import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
 import org.wso2.esbMonitor.network.PassThruHTTPSenderAndReciever;
-import org.wso2.esbMonitor.tasks.DBCleanerTask;
-import org.wso2.esbMonitor.tasks.DBTaskRunner;
-import org.wso2.esbMonitor.tasks.JVMTaskRunner;
-import org.wso2.esbMonitor.tasks.NetworkMonitor;
+import org.wso2.esbMonitor.pingReceiver.PingHandler;
+import org.wso2.esbMonitor.tasks.*;
+
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -55,6 +54,8 @@ public class Configuration {
     private int MAX_REQESTQUEUE_SIZE = 100;
     private long DB_CLEANER_TASK = 24L;
     private String THREAD_DUMP_PATH="ThreadDumps//";
+    private int PING_RECEIVING_PORT=9090;
+    private long PING_DELAY=3000;
 
 
     public void initProperties(){
@@ -72,7 +73,8 @@ public class Configuration {
         RemoteConnector.setPASSWORD(PASSWORD);
         DBCleanerTask.setWaitTime(DB_CLEANER_TASK);
         ThreadDumpCreator.setFilePath(THREAD_DUMP_PATH);
-
+        PingHandler.setPORT(PING_RECEIVING_PORT);
+        ESBStatusCheckerTask.setWaitTime(PING_DELAY);
     }
 
     private void readPropFile(){
@@ -154,6 +156,16 @@ public class Configuration {
             if(prop.getProperty("THREAD_DUMP_PATH") != null){
                 THREAD_DUMP_PATH=prop.getProperty("THREAD_DUMP_PATH");
                 logger.info("Added thread dump path" + THREAD_DUMP_PATH);
+            }
+
+            if(prop.getProperty("PING_RECEIVING_PORT") != null){
+                PING_RECEIVING_PORT=Integer.parseInt(prop.getProperty("PING_RECEIVING_PORT"));
+                logger.info("Added ping receiving port " +PING_RECEIVING_PORT);
+            }
+
+            if(prop.getProperty("PING_DELAY") != null){
+                PING_DELAY=Long.parseLong(prop.getProperty("PING_DELAY"));
+                logger.info("Added ping delay " + PING_DELAY);
             }
 
 
