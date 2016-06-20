@@ -4,7 +4,7 @@
 
 ESB Flight Recorder is a tool that can be used to monitor an instance of ESB.Users can set variable 
 values by changing parameters in wso2esbfr.properties file. 
-ESBMonitor mainly compromises of 4 tasks
+ESBMonitor mainly compromises of 5 tasks
   
   1)JVM monitoring task
   
@@ -13,6 +13,8 @@ ESBMonitor mainly compromises of 4 tasks
   3)Database persisting task
   
   4)Cleaning task
+  
+  5)ESB status checking task
   
 ##Building from source
 
@@ -23,7 +25,7 @@ Use **mvn clean compile assembly:single** to build the esbMonitor from source
 Use **java -jar esbMonitor-1.0-SNAPSHOT-jar-with-dependencies.jar** command to run esbMonitor executable
 jar
 
-##Setting propert values
+##Setting property values
 Many options can be customized through changing values in **wso2esbfr.properties** file.
 - DB_TASK_INTERVAL : Value of this property is used to set period value where ESB events are persisted to
 database. Value is taken in miliseconds. E.g : **DB_TASK_INTERVAL=3000** ESB events are persisted in every 3 sseconds
