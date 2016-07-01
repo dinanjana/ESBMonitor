@@ -20,6 +20,9 @@
 package org.wso2.esbMonitor.tasks;
 
 import org.apache.log4j.Logger;
+import org.wso2.esbMonitor.configuration.Configuration;
+import org.wso2.esbMonitor.connector.RemoteConnector;
+import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
 import org.wso2.esbMonitor.network.PassThruHTTPSenderAndReciever;
 
 /**
@@ -28,36 +31,61 @@ import org.wso2.esbMonitor.network.PassThruHTTPSenderAndReciever;
 public class NetworkMonitor extends Thread {
 
     private Logger logger = Logger.getLogger(NetworkMonitor.class);
-    private PassThruHTTPSenderAndReciever passThruHTTPSender = new PassThruHTTPSenderAndReciever();
-    private PassThruHTTPSenderAndReciever passThruHTTPReciever = new PassThruHTTPSenderAndReciever();
-    private PassThruHTTPSenderAndReciever passThruHTTPSSender = new PassThruHTTPSenderAndReciever();
-    private PassThruHTTPSenderAndReciever passThruHTTPSReciever = new PassThruHTTPSenderAndReciever();
+    private Configuration config;
+    private PassThruHTTPSenderAndReciever passThruHTTPSender;
+    private PassThruHTTPSenderAndReciever passThruHTTPReciever;
+    private PassThruHTTPSenderAndReciever passThruHTTPSSender;
+    private PassThruHTTPSenderAndReciever passThruHTTPSReciever;
+    private RemoteConnector remoteConnector;
+    private ThreadDumpCreator threadDumpCreator;
     //needs to be initialized from a property file
-    private static long WAIT_TIME;
+    private long waitTime;
 
-    public void init(){
-        PassThruHTTPSenderAndReciever.setBean("org.apache.synapse:Type=Transport,Name=passthru-http-sender");
-        PassThruHTTPSenderAndReciever.setBean("org.apache.synapse:Type=Transport,Name=passthru-http-receiver");
-        PassThruHTTPSenderAndReciever.setBean("org.apache.synapse:Type=Transport,Name=passthru-https-sender");
-        PassThruHTTPSenderAndReciever.setBean("org.apache.synapse:Type=Transport,Name=passthru-https-receiver");
 
+    public NetworkMonitor(Configuration config,RemoteConnector remote){
+        this.config = config;
+        this.remoteConnector = remote;
+    }
+    private void initTask(){
+        waitTime=config.getNETWORK_TASK();
+        threadDumpCreator = new ThreadDumpCreator(config,remoteConnector);
+        passThruHTTPSender = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-http-sender",
+                remoteConnector);
+        passThruHTTPReciever = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-http-receiver",
+                remoteConnector);
+        passThruHTTPSSender = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-https-sender",
+                remoteConnector);
+        passThruHTTPSReciever = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-https-receiver",
+                remoteConnector);
+        passThruHTTPSender.setMaxQueueSize(config.getMAX_REQESTQUEUE_SIZE());
+        passThruHTTPSender.setMaxThreadCount(config.getHTTP_REQUESTS());
+        passThruHTTPSender.setThreadDumpCreator(threadDumpCreator);
+        passThruHTTPReciever.setMaxQueueSize(config.getMAX_REQESTQUEUE_SIZE());
+        passThruHTTPReciever.setMaxThreadCount(config.getHTTP_REQUESTS());
+        passThruHTTPReciever.setThreadDumpCreator(threadDumpCreator);
+        passThruHTTPSReciever.setMaxThreadCount(config.getHTTP_REQUESTS());
+        passThruHTTPSReciever.setMaxQueueSize(config.getMAX_REQESTQUEUE_SIZE());
+        passThruHTTPSReciever.setThreadDumpCreator(threadDumpCreator);
+        passThruHTTPSSender.setMaxQueueSize(config.getMAX_REQESTQUEUE_SIZE());
+        passThruHTTPSSender.setMaxThreadCount(config.getHTTP_REQUESTS());
+        passThruHTTPSSender.setThreadDumpCreator(threadDumpCreator);
     }
     public void run(){
-        init();
+        initTask();
         while (true){
             passThruHTTPSender.getMbeanInfo();
             passThruHTTPReciever.getMbeanInfo();
             passThruHTTPSSender.getMbeanInfo();
             passThruHTTPSReciever.getMbeanInfo();
             try {
-                Thread.sleep(WAIT_TIME);
+                Thread.sleep(waitTime);
             } catch (InterruptedException e) {
                 logger.error("Network Thread error" , e);
             }
         }
     }
 
-    public static void setWaitTime(long waitTime) {
-        WAIT_TIME = waitTime;
+    public void setWaitTime(long waitTime) {
+        this.waitTime = waitTime;
     }
 }

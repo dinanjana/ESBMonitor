@@ -60,12 +60,14 @@ public class PersistenceService {
                     " ) ");
         }
         scheduledList.clear();
+        stmt.close();
     }
 
     public static synchronized void cleanDBTables() throws SQLException {
         String tableName = "HTTP_LOG";
         Statement stmt = conn.createStatement();
         stmt.execute("TRUNCATE TABLE "+ tableName);
+        stmt.close();
     }
 
     public static void setConn(Connection conn) {

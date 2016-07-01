@@ -20,6 +20,7 @@
 package org.wso2.esbMonitor.dumpHandlers;
 
 import org.apache.log4j.Logger;
+import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.utils.FileWriter;
 
@@ -37,15 +38,22 @@ import java.util.Date;
  */
 public class ThreadDumpCreator {
     final static Logger logger = Logger.getLogger(ThreadDumpCreator.class);
-    private static MBeanInfo memoryInfo;
-    private static ObjectName bean = null;
-    private static boolean THREAD_DUMP_IN_PROGRESS=false;
-    private static String filePath;
-    private static String THREAD_DUMP_BEAN_NAME = "java.lang:type=Threading";
+    private MBeanInfo memoryInfo;
+    private ObjectName bean = null;
+    private boolean threadDumpInProgress =false;
+    private String filePath;
+    private final String THREAD_DUMP_BEAN_NAME = "java.lang:type=Threading";
+    private RemoteConnector remoteConnector;
+    private Configuration config;
 
     /**
      * For testing purposes only
      */
+
+    public ThreadDumpCreator(Configuration config, RemoteConnector remote){
+        this.remoteConnector = remote;
+        this.config = config;
+    }
     public static String generateThreadDump() {
         final StringBuilder dump = new StringBuilder();
         final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
@@ -72,24 +80,25 @@ public class ThreadDumpCreator {
      * remote JVM
      * */
 
-    public synchronized static void getMbeanInfo() {
-        THREAD_DUMP_IN_PROGRESS = true;
+    public synchronized void getMbeanInfo() {
+        threadDumpInProgress = true;
         StringBuilder dump = new StringBuilder();
+        filePath=config.getTHREAD_DUMP_PATH();
         try {
             bean = new ObjectName(THREAD_DUMP_BEAN_NAME);
-            memoryInfo = RemoteConnector.getRemote().getMBeanInfo(bean);
-            RemoteConnector.getRemote().getObjectInstance(bean);
+            memoryInfo = remoteConnector.getRemote().getMBeanInfo(bean);
+            remoteConnector.getRemote().getObjectInstance(bean);
             MBeanOperationInfo[] mBeanAttributeInfos = memoryInfo.getOperations();
 //            for (MBeanOperationInfo mBeanAttributeInfo : mBeanAttributeInfos) {
 //                System.out.println(mBeanAttributeInfo.getName());
 //            }
-            long[] allThreadIds = (long[]) RemoteConnector.getRemote().getAttribute(bean, "AllThreadIds");
+            long[] allThreadIds = (long[]) remoteConnector.getRemote().getAttribute(bean, "AllThreadIds");
             Object[] params = new Object[2];
             int maxDepth = 100;
             params[0] = allThreadIds;
             params[1] = maxDepth;
             String[] opSigs = {allThreadIds.getClass().getName(), int.class.getName()};
-            CompositeData[] threadInfos = (CompositeData[]) RemoteConnector.getRemote().invoke(bean, "getThreadInfo", params, opSigs);
+            CompositeData[] threadInfos = (CompositeData[]) remoteConnector.getRemote().invoke(bean, "getThreadInfo", params, opSigs);
             for (CompositeData threadInfo : threadInfos) {
                 dump.append('"');
                 dump.append(threadInfo.get("threadName").toString());
@@ -131,15 +140,15 @@ public class ThreadDumpCreator {
             logger.error(e.getMessage());
         }
         finally {
-            THREAD_DUMP_IN_PROGRESS = false;
+            threadDumpInProgress = false;
         }
     }
 
-    public static boolean isThreadDumpInProgress() {
-        return THREAD_DUMP_IN_PROGRESS;
+    public boolean isThreadDumpInProgress() {
+        return threadDumpInProgress;
     }
 
-    public static void setFilePath(String filePath) {
-        ThreadDumpCreator.filePath = filePath;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

@@ -20,6 +20,7 @@
 package org.wso2.esbMonitor.jvmDetails;
 
 import org.apache.log4j.Logger;
+import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
 import javax.management.*;
@@ -32,13 +33,16 @@ import java.lang.management.OperatingSystemMXBean;
 public class CPULoadMonitor {
     final static Logger logger = Logger.getLogger(CPULoadMonitor.class);
     private static ObjectName bean = null;
-
+    private RemoteConnector remote;
+    private final String OBJECT_NAME="java.lang:type=OperatingSystem";
     //needs to be initialized from a property file
-    private static double CPU_LOAD;
+    private double cpuLoad;
+    private Configuration config;
+    private ThreadDumpCreator threadDumpCreator=null;
 
     public void getMbeanInfo() {
         try {
-            bean = new ObjectName("java.lang:type=OperatingSystem");
+            bean = new ObjectName(OBJECT_NAME);
             checkWarningUsage(bean);
 
         } catch (MalformedObjectNameException e) {
@@ -46,15 +50,17 @@ public class CPULoadMonitor {
         }
     }
 
-    private static boolean checkWarningUsage(ObjectName mbean) {
-
+    private boolean checkWarningUsage(ObjectName mbean) {
         OperatingSystemMXBean operatingSystemMXBean=
-                JMX.newMBeanProxy(RemoteConnector.getRemote(), mbean, OperatingSystemMXBean.class);
+                JMX.newMBeanProxy(remote.getRemote(), mbean, OperatingSystemMXBean.class);
         double cpuLoad = operatingSystemMXBean.getSystemLoadAverage();
 
-        if (cpuLoad > CPU_LOAD) {
+        if (cpuLoad > this.cpuLoad) {
             logger.info(":High CPU load");
-            if (!ThreadDumpCreator.isThreadDumpInProgress())
+            if(threadDumpCreator == null){
+                threadDumpCreator = new ThreadDumpCreator(config,remote);
+            }
+            if (!threadDumpCreator.isThreadDumpInProgress())
                 ThreadDumpCreator.generateThreadDump();
             return true;
         } else {
@@ -63,7 +69,15 @@ public class CPULoadMonitor {
         return false;
     }
 
-    public static void setCpuLoad(double cpuLoad) {
-        CPU_LOAD = cpuLoad;
+    public void setCpuLoad(double cpuLoad) {
+        this.cpuLoad = cpuLoad;
+    }
+
+    public void setRemote(RemoteConnector remote) {
+        this.remote = remote;
+    }
+
+    public void setConfig(Configuration config) {
+        this.config = config;
     }
 }

@@ -20,6 +20,7 @@
 package org.wso2.esbMonitor.tasks;
 
 import org.apache.log4j.Logger;
+import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.pingReceiver.PingHandler;
 
 /**
@@ -28,14 +29,22 @@ import org.wso2.esbMonitor.pingReceiver.PingHandler;
 public class ESBStatusCheckerTask extends Thread{
 
     Logger logger = Logger.getLogger(ESBStatusCheckerTask.class);
-    private static long WAIT_TIME;
-    private static boolean status=true;
+    private long waitTime;
+    private boolean status=true;
+    private Configuration configuration;
+
+    public ESBStatusCheckerTask(Configuration configuration){
+        this.configuration = configuration;
+    }
+    private void initTask(){
+        this.waitTime = configuration.getPING_DELAY();
+    }
 
     public void run(){
         while (true){
             long currentTime = System.currentTimeMillis();
             long lastUpdatedTime = PingHandler.getLastUpdatedTime();
-            if(currentTime-lastUpdatedTime > WAIT_TIME){
+            if(currentTime-lastUpdatedTime > waitTime){
                 logger.info("ESB is unresponsive..");
                 /**TODO
                  * Notify
@@ -46,18 +55,18 @@ public class ESBStatusCheckerTask extends Thread{
                 status=true;
             }
             try {
-                Thread.sleep(WAIT_TIME+1000L);
+                Thread.sleep(waitTime +1000L);
             } catch (InterruptedException e) {
                 logger.error("ERROR",e);
             }
         }
     }
 
-    public static void setWaitTime(long waitTime) {
-        WAIT_TIME = waitTime;
+    public void setWaitTime(long waitTime) {
+        this.waitTime = waitTime;
     }
 
-    public static boolean isStatus() {
+    public boolean isStatus() {
         return status;
     }
 }

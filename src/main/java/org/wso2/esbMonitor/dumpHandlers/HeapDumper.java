@@ -25,13 +25,12 @@ package org.wso2.esbMonitor.dumpHandlers;
  */
 
 import com.sun.management.HotSpotDiagnosticMXBean;
+import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 
 import javax.management.JMX;
-import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
-import java.lang.management.ManagementFactory;
 import java.util.Date;
 
 /**
@@ -46,14 +45,21 @@ import java.util.Date;
  * */
 public class HeapDumper extends Thread {
 
-    private static final String HOTSPOT_BEAN_NAME =
+    private final String HOTSPOT_BEAN_NAME =
             "com.sun.management:type=HotSpotDiagnostic";
-    private static volatile HotSpotDiagnosticMXBean hotspotMBean;
-    private static final Object HEAP_DUMP_IN_PROGRESS = new Object();
-    private static String fileName = "heap//";
+    private volatile HotSpotDiagnosticMXBean hotspotMBean;
+    private final Object heapDumpInProgress = new Object();
+    private String fileName = "heap//";
+    private RemoteConnector remoteConnector;
+    private Configuration config;
 
-    static void dumpHeap(String fileName, boolean live) {
-         synchronized (HEAP_DUMP_IN_PROGRESS){
+    public HeapDumper(Configuration config,RemoteConnector remoteConnector){
+        this.remoteConnector=remoteConnector;
+        this.config=config;
+    }
+
+    private void dumpHeap(String fileName, boolean live) {
+         synchronized (heapDumpInProgress){
             initHotspotMBean();
             try {
                 hotspotMBean.dumpHeap(fileName, live);
@@ -66,7 +72,7 @@ public class HeapDumper extends Thread {
 
     }
 
-    private static synchronized void initHotspotMBean() {
+    private synchronized void initHotspotMBean() {
         if (hotspotMBean == null ) {
             synchronized (HeapDumper.class) {
                 if (hotspotMBean == null) {
@@ -74,12 +80,13 @@ public class HeapDumper extends Thread {
                 }
             }
         }
+        fileName=config.getHEAP_DUMP_PATH();
     }
 
 
-    private static HotSpotDiagnosticMXBean getHotspotMBean() {
+    private HotSpotDiagnosticMXBean getHotspotMBean() {
         try {
-            MBeanServerConnection remote = RemoteConnector.getRemote();
+            MBeanServerConnection remote = remoteConnector.getRemote();
             HotSpotDiagnosticMXBean bean = JMX.newMBeanProxy(remote,
                     new ObjectName(HOTSPOT_BEAN_NAME),
                     HotSpotDiagnosticMXBean.class);
@@ -98,9 +105,10 @@ public class HeapDumper extends Thread {
         // by default dump only the live objects
         boolean live = true;
         dumpHeap(name,live);
+
     }
 
-    public static void setFileName(String fileName) {
-        HeapDumper.fileName = fileName;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

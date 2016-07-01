@@ -20,6 +20,7 @@
 package org.wso2.esbMonitor.jvmDetails;
 
 import org.apache.log4j.Logger;
+import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
@@ -34,16 +35,19 @@ import java.io.IOException;
  */
 public class MemoryMonitor{
 
-    final static Logger logger = Logger.getLogger(MemoryMonitor.class);
-    private static ObjectName bean = null;
-    private static double MEMORY;
-    private static final String OBJECT_NAME ="java.lang:type=Memory";
+    final Logger logger = Logger.getLogger(MemoryMonitor.class);
+    private ObjectName bean = null;
+    private double memory;
+    private final String OBJECT_NAME ="java.lang:type=Memory";
+    private RemoteConnector remote;
+    private ThreadDumpCreator threadDumpCreator = null;
+    private HeapDumper heapDumper= null;
+    private Configuration config;
 
     public void getMbeanInfo() {
         try {
             bean = new ObjectName(OBJECT_NAME);
             checkWarningUsage();
-
         } catch (MalformedObjectNameException e) {
             logger.error("MemoryMonitor.java:25 " + e.getMessage());
         }
@@ -52,17 +56,18 @@ public class MemoryMonitor{
     private boolean checkWarningUsage() {
             try {
                 logger.info(":Acessing memory details");
-                CompositeData memoryUsage = (CompositeData) RemoteConnector.getMbeanAttribute(OBJECT_NAME,"HeapMemoryUsage");
+                CompositeData memoryUsage = (CompositeData) remote.getMbeanAttribute(OBJECT_NAME,"HeapMemoryUsage");
                 long maxMemory = (Long) memoryUsage.get("max");
                 long usedMemory = (Long) memoryUsage.get("used");
-
-                if ((double) usedMemory / maxMemory > MEMORY) {
-                    logger.info(":High memory usage");
-
+                if ((double) usedMemory / maxMemory > memory) {
+                    logger.info(":Possible Out of Memory event detected");
+                    //Sends necessary configurations
                     //ToDo Send to report module
-
-                    ThreadDumpCreator.getMbeanInfo();
-                    HeapDumper heapDumper = new HeapDumper();
+                    if(threadDumpCreator == null){
+                        threadDumpCreator = new ThreadDumpCreator(config,remote);
+                    }
+                    threadDumpCreator.getMbeanInfo();
+                    heapDumper = new HeapDumper(config,remote);
                     heapDumper.start();
                     return true;
                 } else {
@@ -82,7 +87,15 @@ public class MemoryMonitor{
         return false;
     }
 
-    public static void setMEMORY(double MEMORY) {
-        MemoryMonitor.MEMORY = MEMORY;
+    public void setMemory(double memory) {
+        this.memory = memory;
+    }
+
+    public void setRemote(RemoteConnector remote) {
+        this.remote = remote;
+    }
+
+    public void setConfig(Configuration config) {
+        this.config = config;
     }
 }

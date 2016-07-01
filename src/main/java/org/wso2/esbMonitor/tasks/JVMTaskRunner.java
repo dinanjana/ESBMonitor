@@ -20,6 +20,8 @@
 package org.wso2.esbMonitor.tasks;
 
 import org.apache.log4j.Logger;
+import org.wso2.esbMonitor.configuration.Configuration;
+import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
 import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
 
@@ -28,26 +30,37 @@ import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
  */
 public class JVMTaskRunner extends Thread{
 
-    private static long WAIT_TIME;
-    private static Logger logger = Logger.getLogger(JVMTaskRunner.class);
+    private Logger logger = Logger.getLogger(JVMTaskRunner.class);
+    private RemoteConnector remoteConnector;
+    private Configuration configuration;
     private MemoryMonitor memoryMonitor = new MemoryMonitor();
     private CPULoadMonitor cpuLoadMonitor = new CPULoadMonitor();
 
+    public JVMTaskRunner(Configuration configuration,RemoteConnector remoteConnector){
+        this.configuration = configuration;
+        this.remoteConnector= remoteConnector;
+    }
+
+    private void initTask(){
+        memoryMonitor.setRemote(remoteConnector);
+        memoryMonitor.setMemory(configuration.getMEMORY_USAGE());
+        memoryMonitor.setConfig(configuration);
+        cpuLoadMonitor.setRemote(remoteConnector);
+        cpuLoadMonitor.setCpuLoad(configuration.getCPU_USAGE());
+        cpuLoadMonitor.setConfig(configuration);
+    }
 
     public void run(){
+        initTask();
         while (true){
             try {
                 memoryMonitor.getMbeanInfo();
                 cpuLoadMonitor.getMbeanInfo();
-
-                Thread.sleep(WAIT_TIME);
+                Thread.sleep(configuration.getJVM_TASK());
             } catch (InterruptedException e) {
                 logger.error("Thread wait Exception",e);
             }
         }
     }
 
-    public static void setWaitTime(long waitTime) {
-        WAIT_TIME = waitTime;
-    }
 }

@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
+import org.wso2.esbMonitor.esbEvents.ESBEvent;
 import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
 import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
 import org.wso2.esbMonitor.network.PassThruHTTPSenderAndReciever;
@@ -30,6 +31,8 @@ import org.wso2.esbMonitor.pingReceiver.PingHandler;
 import org.wso2.esbMonitor.tasks.*;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -38,8 +41,8 @@ import java.util.Properties;
  * to initiate tasks
  */
 public class Configuration {
-    private static Logger logger = Logger.getLogger(Configuration.class);
-    private static final String FILE_NAME = "wso2esbfr.properties";
+    private Logger logger = Logger.getLogger(Configuration.class);
+    private final String FILE_NAME = "wso2esbfr.properties";
     private long DB_TASK = 3000;
     private long JVM_TASK = 3000;
     private long NETWORK_TASK = 3000;
@@ -56,25 +59,26 @@ public class Configuration {
     private String THREAD_DUMP_PATH="ThreadDumps//";
     private int PING_RECEIVING_PORT=9090;
     private long PING_DELAY=3000;
+    private List<EventConfiguration> eventConfigurations = new ArrayList<>();
 
 
     public void initProperties(){
         readPropFile();
-        DBTaskRunner.setWaitTime(DB_TASK);
-        JVMTaskRunner.setWaitTime(JVM_TASK);
-        NetworkMonitor.setWaitTime(NETWORK_TASK);
-        HeapDumper.setFileName(HEAP_DUMP_PATH+"/");
-        MemoryMonitor.setMEMORY(MEMORY_USAGE);
-        CPULoadMonitor.setCpuLoad(CPU_USAGE);
-        PassThruHTTPSenderAndReciever.setMaxQueueSize(MAX_REQESTQUEUE_SIZE);
-        PassThruHTTPSenderAndReciever.setMaxThreadCount(HTTP_REQUESTS);
-        RemoteConnector.setJMXURL(JMXURL);
-        RemoteConnector.setUSERNAME(USERNAME);
-        RemoteConnector.setPASSWORD(PASSWORD);
-        DBCleanerTask.setWaitTime(DB_CLEANER_TASK);
-        ThreadDumpCreator.setFilePath(THREAD_DUMP_PATH);
-        PingHandler.setPORT(PING_RECEIVING_PORT);
-        ESBStatusCheckerTask.setWaitTime(PING_DELAY);
+//        DBTaskRunner.setWaitTime(DB_TASK);
+//        JVMTaskRunner.setWaitTime(JVM_TASK);
+//        NetworkMonitor.setWaitTime(NETWORK_TASK);
+//        HeapDumper.setFileName(HEAP_DUMP_PATH+"/");
+//        MemoryMonitor.setMemory(MEMORY_USAGE);
+//        CPULoadMonitor.setCpuLoad(CPU_USAGE);
+//        PassThruHTTPSenderAndReciever.setMaxQueueSize(MAX_REQESTQUEUE_SIZE);
+//        PassThruHTTPSenderAndReciever.setMaxThreadCount(HTTP_REQUESTS);
+//        RemoteConnector.setJmxurl(JMXURL);
+//        RemoteConnector.setUsername(USERNAME);
+//        RemoteConnector.setPassword(PASSWORD);
+//        DBCleanerTask.setWaitTime(DB_CLEANER_TASK);
+//        ThreadDumpCreator.setFilePath(THREAD_DUMP_PATH);
+//        PingHandler.setPORT(PING_RECEIVING_PORT);
+//        ESBStatusCheckerTask.setWaitTime(PING_DELAY);
     }
 
     private void readPropFile(){
@@ -174,5 +178,78 @@ public class Configuration {
             logger.error("Property file error",e);
         }
 
+    }
+
+    class EventConfiguration{
+
+
+    }
+
+    public String getFILE_NAME() {
+        return FILE_NAME;
+    }
+
+    public long getDB_TASK() {
+        return DB_TASK;
+    }
+
+    public long getJVM_TASK() {
+        return JVM_TASK;
+    }
+
+    public long getNETWORK_TASK() {
+        return NETWORK_TASK;
+    }
+
+    public String getHEAP_DUMP_PATH() {
+        return HEAP_DUMP_PATH;
+    }
+
+    public String getEMAIL_ADDRESS() {
+        return EMAIL_ADDRESS;
+    }
+
+    public String getJMXURL() {
+        return JMXURL;
+    }
+
+    public String getUSERNAME() {
+        return USERNAME;
+    }
+
+    public String getPASSWORD() {
+        return PASSWORD;
+    }
+
+    public Double getMEMORY_USAGE() {
+        return MEMORY_USAGE;
+    }
+
+    public Double getCPU_USAGE() {
+        return CPU_USAGE;
+    }
+
+    public int getHTTP_REQUESTS() {
+        return HTTP_REQUESTS;
+    }
+
+    public int getMAX_REQESTQUEUE_SIZE() {
+        return MAX_REQESTQUEUE_SIZE;
+    }
+
+    public long getDB_CLEANER_TASK() {
+        return DB_CLEANER_TASK;
+    }
+
+    public String getTHREAD_DUMP_PATH() {
+        return THREAD_DUMP_PATH;
+    }
+
+    public int getPING_RECEIVING_PORT() {
+        return PING_RECEIVING_PORT;
+    }
+
+    public long getPING_DELAY() {
+        return PING_DELAY;
     }
 }

@@ -20,6 +20,7 @@
 package org.wso2.esbMonitor.network;
 
 import org.apache.log4j.Logger;
+import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
 import org.wso2.esbMonitor.persistance.PersistenceService;
@@ -36,11 +37,17 @@ import java.util.Date;
 public class PassThruHTTPSenderAndReciever {
 
     final static Logger logger = Logger.getLogger(PassThruHTTPSenderAndReciever.class);
-    private static String bean;
-
+    private String bean;
+    private RemoteConnector remote;
     // needs to be initialized by a property file
-    private static int maxThreadCount;
-    private static int maxQueueSize;
+    private int maxThreadCount;
+    private int maxQueueSize;
+    private ThreadDumpCreator threadDumpCreator = null;
+
+    public PassThruHTTPSenderAndReciever(String bean,RemoteConnector remote){
+        this.bean = bean;
+        this.remote=remote;
+    }
 
     public void getMbeanInfo() {
         if(checkWarningUsage(bean)){
@@ -55,14 +62,14 @@ public class PassThruHTTPSenderAndReciever {
 
         try {
             logger.info(":Accessing HTTP transport details ");
-            passThruHTTPBean.setActiveThreadCount((int) RemoteConnector.getMbeanAttribute(mbeanName,"ActiveThreadCount"));
-            passThruHTTPBean.setAvgSizeRecieved((Double) RemoteConnector.getMbeanAttribute(mbeanName,"AvgSizeReceived"));
-            passThruHTTPBean.setAvgSizeSent((Double) RemoteConnector.getMbeanAttribute(mbeanName,"AvgSizeSent"));
-            passThruHTTPBean.setFaultSending((Long) RemoteConnector.getMbeanAttribute(mbeanName,"FaultsSending"));
-            passThruHTTPBean.setFaultsRecieving((Long) RemoteConnector.getMbeanAttribute(mbeanName,"FaultsReceiving"));
-            passThruHTTPBean.setQueueSize((Integer) RemoteConnector.getMbeanAttribute(mbeanName,"QueueSize"));
-            passThruHTTPBean.setMessageSent((Long) RemoteConnector.getMbeanAttribute(mbeanName,"MessagesSent"));
-            passThruHTTPBean.setMessagesRecieved((Long) RemoteConnector.getMbeanAttribute(mbeanName, "MessagesReceived"));
+            passThruHTTPBean.setActiveThreadCount((int) remote.getMbeanAttribute(mbeanName, "ActiveThreadCount"));
+            passThruHTTPBean.setAvgSizeRecieved((Double) remote.getMbeanAttribute(mbeanName,"AvgSizeReceived"));
+            passThruHTTPBean.setAvgSizeSent((Double) remote.getMbeanAttribute(mbeanName,"AvgSizeSent"));
+            passThruHTTPBean.setFaultSending((Long) remote.getMbeanAttribute(mbeanName,"FaultsSending"));
+            passThruHTTPBean.setFaultsRecieving((Long) remote.getMbeanAttribute(mbeanName,"FaultsReceiving"));
+            passThruHTTPBean.setQueueSize((Integer) remote.getMbeanAttribute(mbeanName,"QueueSize"));
+            passThruHTTPBean.setMessageSent((Long) remote.getMbeanAttribute(mbeanName,"MessagesSent"));
+            passThruHTTPBean.setMessagesRecieved((Long) remote.getMbeanAttribute(mbeanName, "MessagesReceived"));
             passThruHTTPBean.setDate(new Date());
             switch (bean){
                 case "org.apache.synapse:Type=Transport,Name=passthru-http-sender":
@@ -83,9 +90,8 @@ public class PassThruHTTPSenderAndReciever {
 
             if(passThruHTTPBean.getActiveThreadCount() > maxThreadCount || passThruHTTPBean.getQueueSize() > maxQueueSize) {
                 logger.info(":High HTTP loads");
-
-                if(!ThreadDumpCreator.isThreadDumpInProgress()){
-                    ThreadDumpCreator.generateThreadDump();
+                if(!threadDumpCreator.isThreadDumpInProgress()){
+                    threadDumpCreator.getMbeanInfo();
                 }
                 return true;
 
@@ -114,15 +120,15 @@ public class PassThruHTTPSenderAndReciever {
         return false;
     }
 
-    public static void setBean(String bean) {
-        PassThruHTTPSenderAndReciever.bean = bean;
+    public void setMaxThreadCount(int maxThreadCount) {
+        this.maxThreadCount = maxThreadCount;
     }
 
-    public static void setMaxThreadCount(int maxThreadCount) {
-        PassThruHTTPSenderAndReciever.maxThreadCount = maxThreadCount;
+    public void setMaxQueueSize(int maxQueueSize) {
+        this.maxQueueSize = maxQueueSize;
     }
 
-    public static void setMaxQueueSize(int maxQueueSize) {
-        PassThruHTTPSenderAndReciever.maxQueueSize = maxQueueSize;
+    public void setThreadDumpCreator(ThreadDumpCreator threadDumpCreator) {
+        this.threadDumpCreator = threadDumpCreator;
     }
 }
