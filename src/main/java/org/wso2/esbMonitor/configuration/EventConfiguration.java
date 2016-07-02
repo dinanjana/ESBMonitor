@@ -26,6 +26,25 @@ import org.wso2.esbMonitor.esbEvents.ESBEvent;
  */
 public class EventConfiguration extends Configuration {
     private ESBEvent eventName;
+    private int maxThreadDumps;
+    private int maxHeapDumps;
+    private long eventPeriod;
 
+    public void initProperties(){}
 
+    public void setEventName(ESBEvent eventName) {
+        this.eventName = eventName;
+    }
+
+    public int getMaxThreadDumps() {
+        return maxThreadDumps;
+    }
+
+    public int getMaxHeapDumps() {
+        return maxHeapDumps;
+    }
+
+    public long getEventPeriod() {
+        return eventPeriod;
+    }
 }

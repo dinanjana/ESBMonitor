@@ -43,10 +43,10 @@ public class JVMTaskRunner extends Thread{
 
     private void initTask(){
         memoryMonitor.setRemote(remoteConnector);
-        memoryMonitor.setMemory(configuration.getMEMORY_USAGE());
+        memoryMonitor.setMemory(configuration.getConfigurationBean().getMemoryUsage());
         memoryMonitor.setConfig(configuration);
         cpuLoadMonitor.setRemote(remoteConnector);
-        cpuLoadMonitor.setCpuLoad(configuration.getCPU_USAGE());
+        cpuLoadMonitor.setCpuLoad(configuration.getConfigurationBean().getCpuUsage());
         cpuLoadMonitor.setConfig(configuration);
     }
 
@@ -56,7 +56,7 @@ public class JVMTaskRunner extends Thread{
             try {
                 memoryMonitor.getMbeanInfo();
                 cpuLoadMonitor.getMbeanInfo();
-                Thread.sleep(configuration.getJVM_TASK());
+                Thread.sleep(configuration.getConfigurationBean().getJvmTask());
             } catch (InterruptedException e) {
                 logger.error("Thread wait Exception",e);
             }

@@ -21,9 +21,12 @@ package org.wso2.esbMonitor.jvmDetails;
 
 import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
+import org.wso2.esbMonitor.configuration.EventConfiguration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
+import org.wso2.esbMonitor.esbEvents.ESBEvent;
+
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import java.io.IOException;
@@ -43,6 +46,12 @@ public class MemoryMonitor{
     private ThreadDumpCreator threadDumpCreator = null;
     private HeapDumper heapDumper= null;
     private Configuration config;
+    private int maxNumOfThreadDumps;
+    private int maxNumOfHeapDumps;
+    private long eventEndTime;
+    private long threadDumpsCreated;
+    private long heapDumpsCreated;
+    private boolean eventDetected=false;
 
     public void getMbeanInfo() {
         try {
@@ -61,14 +70,33 @@ public class MemoryMonitor{
                 long usedMemory = (Long) memoryUsage.get("used");
                 if ((double) usedMemory / maxMemory > memory) {
                     logger.info(":Possible Out of Memory event detected");
-                    //Sends necessary configurations
-                    //ToDo Send to report module
+                    //Grab necessary config from config object
+                    if(!eventDetected){
+                        EventConfiguration eventConfiguration = config.getEventConfigurations().get(ESBEvent.OOM_EVENT);
+                        maxNumOfHeapDumps=eventConfiguration.getMaxHeapDumps();
+                        maxNumOfThreadDumps=eventConfiguration.getMaxThreadDumps();
+                        eventEndTime=eventConfiguration.getEventPeriod() + System.currentTimeMillis();
+                        eventDetected=true;
+                        threadDumpsCreated=0;
+                        heapDumpsCreated=0;
+                        //ToDo Send to report module
+                    }
                     if(threadDumpCreator == null){
                         threadDumpCreator = new ThreadDumpCreator(config,remote);
                     }
-                    threadDumpCreator.getMbeanInfo();
-                    heapDumper = new HeapDumper(config,remote);
-                    heapDumper.start();
+                    //Checks if event as elapsed and if the number of dumps
+                    //allowed elapsed
+                    if(System.currentTimeMillis() < eventEndTime &&
+                            threadDumpsCreated <= maxNumOfThreadDumps){
+                        threadDumpCreator.getMbeanInfo();
+                        threadDumpsCreated++;
+                    }
+                    if(System.currentTimeMillis() < eventEndTime &&
+                            heapDumpsCreated <= maxNumOfHeapDumps){
+                        heapDumper = new HeapDumper(config,remote);
+                        heapDumper.start();
+                        heapDumpsCreated++;
+                    }
                     return true;
                 } else {
                     logger.info("Memory usage is normal " + (double) usedMemory / maxMemory);

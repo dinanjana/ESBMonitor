@@ -47,7 +47,7 @@ public class NetworkMonitor extends Thread {
         this.remoteConnector = remote;
     }
     private void initTask(){
-        waitTime=config.getNETWORK_TASK();
+        waitTime=config.getConfigurationBean().getNetworkTask();
         threadDumpCreator = new ThreadDumpCreator(config,remoteConnector);
         passThruHTTPSender = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-http-sender",
                 remoteConnector);
@@ -57,17 +57,17 @@ public class NetworkMonitor extends Thread {
                 remoteConnector);
         passThruHTTPSReciever = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-https-receiver",
                 remoteConnector);
-        passThruHTTPSender.setMaxQueueSize(config.getMAX_REQESTQUEUE_SIZE());
-        passThruHTTPSender.setMaxThreadCount(config.getHTTP_REQUESTS());
+        passThruHTTPSender.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
+        passThruHTTPSender.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
         passThruHTTPSender.setThreadDumpCreator(threadDumpCreator);
-        passThruHTTPReciever.setMaxQueueSize(config.getMAX_REQESTQUEUE_SIZE());
-        passThruHTTPReciever.setMaxThreadCount(config.getHTTP_REQUESTS());
+        passThruHTTPReciever.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
+        passThruHTTPReciever.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
         passThruHTTPReciever.setThreadDumpCreator(threadDumpCreator);
-        passThruHTTPSReciever.setMaxThreadCount(config.getHTTP_REQUESTS());
-        passThruHTTPSReciever.setMaxQueueSize(config.getMAX_REQESTQUEUE_SIZE());
+        passThruHTTPSReciever.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
+        passThruHTTPSReciever.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
         passThruHTTPSReciever.setThreadDumpCreator(threadDumpCreator);
-        passThruHTTPSSender.setMaxQueueSize(config.getMAX_REQESTQUEUE_SIZE());
-        passThruHTTPSSender.setMaxThreadCount(config.getHTTP_REQUESTS());
+        passThruHTTPSSender.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
+        passThruHTTPSSender.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
         passThruHTTPSSender.setThreadDumpCreator(threadDumpCreator);
     }
     public void run(){

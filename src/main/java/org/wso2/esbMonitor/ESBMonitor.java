@@ -56,8 +56,10 @@ public class ESBMonitor {
         jvmTaskRunner.start();
         NetworkMonitor networkMonitor = new NetworkMonitor(config,remoteConnector);
         networkMonitor.start();
-        new DBTaskRunner().start();
-        new DBCleanerTask().start();
+        DBTaskRunner dbTaskRunner =new DBTaskRunner(config);
+        dbTaskRunner.start();
+        DBCleanerTask dbCleanerTask=new DBCleanerTask(config);
+        dbCleanerTask.start();
         new PingHandler().start();
         ESBStatusCheckerTask esbStatusCheckerTask = new ESBStatusCheckerTask(config);
         esbStatusCheckerTask.start();

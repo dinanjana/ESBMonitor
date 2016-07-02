@@ -20,6 +20,7 @@
 package org.wso2.esbMonitor.tasks;
 
 import org.apache.log4j.Logger;
+import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.persistance.PersistenceService;
 
 import java.sql.SQLException;
@@ -28,12 +29,22 @@ import java.sql.SQLException;
  * Created by Dinanjana on 18/06/2016.
  */
 public class DBCleanerTask extends Thread {
-    private static Long WAIT_TIME = 24 * 60 * 60 *1000L ;
-    private static final Logger logger = Logger.getLogger(DBCleanerTask.class);
+    private Long waitTime = 24 * 60 * 60 *1000L ;
+    private final Logger logger = Logger.getLogger(DBCleanerTask.class);
+    private Configuration configuration;
+
+    public DBCleanerTask(Configuration configuration){
+        this.configuration = configuration;
+    }
+
+    private void initTask(){
+        this.waitTime = configuration.getConfigurationBean().getDbCleanerTask();
+    }
 
     public void run(){
+        initTask();
         try {
-            Thread.sleep(WAIT_TIME);
+            Thread.sleep(waitTime);
         } catch (InterruptedException e) {
             logger.error("ERROR" , e);
         }
@@ -45,7 +56,4 @@ public class DBCleanerTask extends Thread {
 
     }
 
-    public static void setWaitTime(Long waitTime) {
-        WAIT_TIME = waitTime*60*60*1000;
-    }
 }

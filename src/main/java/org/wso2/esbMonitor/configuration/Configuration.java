@@ -31,9 +31,7 @@ import org.wso2.esbMonitor.pingReceiver.PingHandler;
 import org.wso2.esbMonitor.tasks.*;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by Dinanjana on 31/05/2016.
@@ -43,26 +41,18 @@ import java.util.Properties;
 public class Configuration {
     private Logger logger = Logger.getLogger(Configuration.class);
     private final String FILE_NAME = "wso2esbfr.properties";
-    private long DB_TASK = 3000;
-    private long JVM_TASK = 3000;
-    private long NETWORK_TASK = 3000;
-    private String HEAP_DUMP_PATH;
-    private String EMAIL_ADDRESS;
+    private ConfigurationBean configurationBean;
+    private EventConfiguration eventConfiguration;
+
     private String JMXURL="service:jmx:rmi://localhost:11111/jndi/rmi://localhost:9999/jmxrmi";
     private String USERNAME="admin";
     private String PASSWORD="admin";
-    private Double MEMORY_USAGE = 0.7;
-    private Double CPU_USAGE = 0.7;
-    private int HTTP_REQUESTS = 100;
-    private int MAX_REQESTQUEUE_SIZE = 100;
-    private long DB_CLEANER_TASK = 24L;
-    private String THREAD_DUMP_PATH="ThreadDumps//";
-    private int PING_RECEIVING_PORT=9090;
-    private long PING_DELAY=3000;
-    private List<EventConfiguration> eventConfigurations = new ArrayList<>();
+
+    private Map<ESBEvent,EventConfiguration> eventConfigurations = new HashMap<>();
 
 
     public void initProperties(){
+        configurationBean = new ConfigurationBean();
         readPropFile();
 //        DBTaskRunner.setWaitTime(DB_TASK);
 //        JVMTaskRunner.setWaitTime(JVM_TASK);
@@ -77,7 +67,7 @@ public class Configuration {
 //        RemoteConnector.setPassword(PASSWORD);
 //        DBCleanerTask.setWaitTime(DB_CLEANER_TASK);
 //        ThreadDumpCreator.setFilePath(THREAD_DUMP_PATH);
-//        PingHandler.setPORT(PING_RECEIVING_PORT);
+//        PingHandler.setPort(PING_RECEIVING_PORT);
 //        ESBStatusCheckerTask.setWaitTime(PING_DELAY);
     }
 
@@ -93,48 +83,48 @@ public class Configuration {
             }
 
             if(prop.getProperty("DB_TASK_INTERVAL") != null){
-                DB_TASK= Long.parseLong(prop.getProperty("DB_TASK_INTERVAL"));
-                logger.info("Added db task interval "+ DB_TASK);
+                configurationBean.setDbTask(Long.parseLong(prop.getProperty("DB_TASK_INTERVAL")));
+                logger.info("Added db task interval "+ configurationBean.getDbTask());
             }
 
             if(prop.getProperty("JVM_TASK_INTERVAL")!= null){
-                JVM_TASK= Long.parseLong(prop.getProperty("JVM_TASK_INTERVAL"));
-                logger.info("Added jvm task interval "+ JVM_TASK);
+                configurationBean.setJvmTask(Long.parseLong(prop.getProperty("JVM_TASK_INTERVAL")));
+                logger.info("Added jvm task interval "+ configurationBean.getJvmTask());
             }
 
             if(prop.getProperty("NETWORK_TASK_INTERVAL") != null){
-                NETWORK_TASK= Long.parseLong(prop.getProperty("NETWORK_TASK_INTERVAL"));
-                logger.info("Added network task interval "+ NETWORK_TASK);
+                configurationBean.setNetworkTask(Long.parseLong(prop.getProperty("NETWORK_TASK_INTERVAL")));
+                logger.info("Added network task interval "+ configurationBean.getNetworkTask());
             }
 
             if(prop.getProperty("HEAP_DUMP_PATH") != null){
-                HEAP_DUMP_PATH=prop.getProperty("HEAP_DUMP_PATH");
-                logger.info("Added heap dump path "+ HEAP_DUMP_PATH);
+                configurationBean.setHeapDumpPath(prop.getProperty("HEAP_DUMP_PATH"));
+                logger.info("Added heap dump path "+ configurationBean.getHeapDumpPath());
             }
 
             if(prop.getProperty("EMAIL_ADDRESS")!= null){
-                EMAIL_ADDRESS=prop.getProperty("EMAIL_ADDRESS");
-                logger.info("Added Email address "+ EMAIL_ADDRESS);
+                configurationBean.setEmailAddress(prop.getProperty("EMAIL_ADDRESS"));
+                logger.info("Added Email address "+ configurationBean.getEmailAddress());
             }
 
             if(prop.getProperty("MAX_MEMORY_USAGE")!= null){
-                MEMORY_USAGE=Double.parseDouble(prop.getProperty("MAX_MEMORY_USAGE"));
-                logger.info("Added max memory usage "+ MEMORY_USAGE);
+                configurationBean.setMemoryUsage(Double.parseDouble(prop.getProperty("MAX_MEMORY_USAGE")));
+                logger.info("Added max memory usage "+ configurationBean.getEmailAddress());
             }
 
             if(prop.getProperty("MAX_CPU_USAGE")!=null){
-                CPU_USAGE=Double.parseDouble(prop.getProperty("MAX_CPU_USAGE"));
-                logger.info("Added max CPU usage " + CPU_USAGE);
+                configurationBean.setCpuUsage(Double.parseDouble(prop.getProperty("MAX_CPU_USAGE")));
+                logger.info("Added max CPU usage " + configurationBean.getCpuUsage());
             }
 
             if(prop.getProperty("MAX_REQUEST_QUEUE_SIZE") != null){
-                MAX_REQESTQUEUE_SIZE=Integer.parseInt(prop.getProperty("MAX_REQUEST_QUEUE_SIZE"));
-                logger.info("Added max request queue size "+MAX_REQESTQUEUE_SIZE);
+                configurationBean.setMaxReqestqueueSize(Integer.parseInt(prop.getProperty("MAX_REQUEST_QUEUE_SIZE")));
+                logger.info("Added max request queue size "+configurationBean.getMaxReqestqueueSize());
             }
 
             if(prop.getProperty("MAX_HTTP_REQUESTS") != null){
-                HTTP_REQUESTS=Integer.parseInt(prop.getProperty("MAX_HTTP_REQUESTS"));
-                logger.info("Added max http requests "+ HTTP_REQUESTS);
+                configurationBean.setHttpRequests(Integer.parseInt(prop.getProperty("MAX_HTTP_REQUESTS")));
+                logger.info("Added max http requests "+ configurationBean.getHttpRequests());
             }
 
             if(prop.getProperty("JMX_SERVICE_URL") != null){
@@ -153,23 +143,23 @@ public class Configuration {
             }
 
             if(prop.getProperty("DB_CLEANER_TASK") != null){
-                DB_CLEANER_TASK=Long.parseLong(prop.getProperty("DB_CLEANER_TASK"));
-                logger.info("Added DB cleaner task wait time "+ DB_CLEANER_TASK);
+                configurationBean.setDbCleanerTask(Long.parseLong(prop.getProperty("DB_CLEANER_TASK")));
+                logger.info("Added DB cleaner task wait time "+ configurationBean.getDbCleanerTask());
             }
 
             if(prop.getProperty("THREAD_DUMP_PATH") != null){
-                THREAD_DUMP_PATH=prop.getProperty("THREAD_DUMP_PATH");
-                logger.info("Added thread dump path" + THREAD_DUMP_PATH);
+                configurationBean.setThreadDumpPath(prop.getProperty("THREAD_DUMP_PATH"));
+                logger.info("Added thread dump path" + configurationBean.getThreadDumpPath());
             }
 
             if(prop.getProperty("PING_RECEIVING_PORT") != null){
-                PING_RECEIVING_PORT=Integer.parseInt(prop.getProperty("PING_RECEIVING_PORT"));
-                logger.info("Added ping receiving port " +PING_RECEIVING_PORT);
+                configurationBean.setPingReceivingPort(Integer.parseInt(prop.getProperty("PING_RECEIVING_PORT")));
+                logger.info("Added ping receiving port " + configurationBean.getPingReceivingPort());
             }
 
             if(prop.getProperty("PING_DELAY") != null){
-                PING_DELAY=Long.parseLong(prop.getProperty("PING_DELAY"));
-                logger.info("Added ping delay " + PING_DELAY);
+                configurationBean.setPingDelay(Long.parseLong(prop.getProperty("PING_DELAY")));
+                logger.info("Added ping delay " + configurationBean.getPingDelay());
             }
 
 
@@ -178,35 +168,6 @@ public class Configuration {
             logger.error("Property file error",e);
         }
 
-    }
-
-    class EventConfiguration{
-
-
-    }
-
-    public String getFILE_NAME() {
-        return FILE_NAME;
-    }
-
-    public long getDB_TASK() {
-        return DB_TASK;
-    }
-
-    public long getJVM_TASK() {
-        return JVM_TASK;
-    }
-
-    public long getNETWORK_TASK() {
-        return NETWORK_TASK;
-    }
-
-    public String getHEAP_DUMP_PATH() {
-        return HEAP_DUMP_PATH;
-    }
-
-    public String getEMAIL_ADDRESS() {
-        return EMAIL_ADDRESS;
     }
 
     public String getJMXURL() {
@@ -221,35 +182,11 @@ public class Configuration {
         return PASSWORD;
     }
 
-    public Double getMEMORY_USAGE() {
-        return MEMORY_USAGE;
+    public ConfigurationBean getConfigurationBean() {
+        return configurationBean;
     }
 
-    public Double getCPU_USAGE() {
-        return CPU_USAGE;
-    }
-
-    public int getHTTP_REQUESTS() {
-        return HTTP_REQUESTS;
-    }
-
-    public int getMAX_REQESTQUEUE_SIZE() {
-        return MAX_REQESTQUEUE_SIZE;
-    }
-
-    public long getDB_CLEANER_TASK() {
-        return DB_CLEANER_TASK;
-    }
-
-    public String getTHREAD_DUMP_PATH() {
-        return THREAD_DUMP_PATH;
-    }
-
-    public int getPING_RECEIVING_PORT() {
-        return PING_RECEIVING_PORT;
-    }
-
-    public long getPING_DELAY() {
-        return PING_DELAY;
+    public Map<ESBEvent, EventConfiguration> getEventConfigurations() {
+        return eventConfigurations;
     }
 }

@@ -32,11 +32,11 @@ import java.net.InetSocketAddress;
  */
 public class PingHandler extends Thread{
     private static Logger logger = Logger.getLogger(PingHandler.class);
-    private static int PORT = 9090;
+    private static int port = 9090;
     private static long lastUpdatedTime=0;
 
     private static void initPingReceiver() throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/ping", new MyHandler());
         server.setExecutor(null); // creates a default executor
         server.start();
@@ -64,8 +64,8 @@ public class PingHandler extends Thread{
         }
     }
 
-    public static void setPORT(int PORT) {
-        PingHandler.PORT = PORT;
+    public static void setPort(int port) {
+        PingHandler.port = port;
     }
 
     public static long getLastUpdatedTime(){

@@ -83,7 +83,7 @@ public class ThreadDumpCreator {
     public synchronized void getMbeanInfo() {
         threadDumpInProgress = true;
         StringBuilder dump = new StringBuilder();
-        filePath=config.getTHREAD_DUMP_PATH();
+        filePath=config.getConfigurationBean().getThreadDumpPath();
         try {
             bean = new ObjectName(THREAD_DUMP_BEAN_NAME);
             memoryInfo = remoteConnector.getRemote().getMBeanInfo(bean);

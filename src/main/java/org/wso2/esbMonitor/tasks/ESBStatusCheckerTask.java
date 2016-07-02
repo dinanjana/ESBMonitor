@@ -37,7 +37,7 @@ public class ESBStatusCheckerTask extends Thread{
         this.configuration = configuration;
     }
     private void initTask(){
-        this.waitTime = configuration.getPING_DELAY();
+        this.waitTime = configuration.getConfigurationBean().getPingDelay();
     }
 
     public void run(){

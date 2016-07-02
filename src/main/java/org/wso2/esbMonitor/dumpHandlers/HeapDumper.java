@@ -80,7 +80,7 @@ public class HeapDumper extends Thread {
                 }
             }
         }
-        fileName=config.getHEAP_DUMP_PATH();
+        fileName=config.getConfigurationBean().getHeapDumpPath();
     }
 
 
