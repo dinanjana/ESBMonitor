@@ -39,7 +39,6 @@ import java.io.IOException;
 public class MemoryMonitor{
 
     final Logger logger = Logger.getLogger(MemoryMonitor.class);
-    private ObjectName bean = null;
     private double memory;
     private final String OBJECT_NAME ="java.lang:type=Memory";
     private RemoteConnector remote;
@@ -54,23 +53,22 @@ public class MemoryMonitor{
     private boolean eventDetected=false;
 
     public void getMbeanInfo() {
-        try {
-            bean = new ObjectName(OBJECT_NAME);
-            checkWarningUsage();
-        } catch (MalformedObjectNameException e) {
-            logger.error("MemoryMonitor.java:25 " + e.getMessage());
-        }
+
+            //bean = new ObjectName(OBJECT_NAME);
+        checkWarningUsage();
+
     }
 
-    private boolean checkWarningUsage() {
+    private void checkWarningUsage() {
             try {
-                logger.info(":Acessing memory details");
+                logger.info(":Accessing memory details");
                 CompositeData memoryUsage = (CompositeData) remote.getMbeanAttribute(OBJECT_NAME,"HeapMemoryUsage");
                 long maxMemory = (Long) memoryUsage.get("max");
                 long usedMemory = (Long) memoryUsage.get("used");
                 if ((double) usedMemory / maxMemory > memory) {
                     logger.info(":Possible Out of Memory event detected");
-                    //Grab necessary config from config object
+                    //Records the new event
+                    // Grab necessary config from config object
                     if(!eventDetected){
                         EventConfiguration eventConfiguration = config.getEventConfigurations().get(ESBEvent.OOM_EVENT);
                         maxNumOfHeapDumps=eventConfiguration.getMaxHeapDumps();
@@ -80,27 +78,37 @@ public class MemoryMonitor{
                         threadDumpsCreated=0;
                         heapDumpsCreated=0;
                         //ToDo Send to report module
+                        logger.info("New OOM event started.Ends on "+eventEndTime+
+                                " Maximum of "+maxNumOfThreadDumps + " and maximum of "+maxNumOfHeapDumps
+                        +" will be created.");
                     }
                     if(threadDumpCreator == null){
                         threadDumpCreator = new ThreadDumpCreator(config,remote);
                     }
-                    //Checks if event as elapsed and if the number of dumps
+                    //Checks if event has elapsed and if the number of dumps
                     //allowed elapsed
-                    if(System.currentTimeMillis() < eventEndTime &&
-                            threadDumpsCreated <= maxNumOfThreadDumps){
-                        threadDumpCreator.getMbeanInfo();
-                        threadDumpsCreated++;
+                    if(System.currentTimeMillis() < eventEndTime){
+                        if(threadDumpsCreated <= maxNumOfThreadDumps){
+                            threadDumpCreator.getMbeanInfo();
+                            threadDumpsCreated++;
+                            logger.info("Thread dump created");
+                        }
+                        if(heapDumpsCreated <= maxNumOfHeapDumps){
+                            heapDumper = new HeapDumper(config,remote);
+                            heapDumper.start();
+                            heapDumpsCreated++;
+                            logger.info("Heap dump created");
+                        }
                     }
-                    if(System.currentTimeMillis() < eventEndTime &&
-                            heapDumpsCreated <= maxNumOfHeapDumps){
-                        heapDumper = new HeapDumper(config,remote);
-                        heapDumper.start();
-                        heapDumpsCreated++;
-                    }
-                    return true;
                 } else {
                     logger.info("Memory usage is normal " + (double) usedMemory / maxMemory);
                 }
+                //Event ends
+                if(System.currentTimeMillis() >= eventEndTime && eventDetected){
+                    eventDetected=false;
+                    logger.info("Event ended on " +System.currentTimeMillis());
+                }
+
             } catch (MBeanException e) {
                 logger.error(e.getMessage());
             } catch (AttributeNotFoundException e) {
@@ -112,7 +120,6 @@ public class MemoryMonitor{
             } catch (IOException e) {
                 logger.error(e.getMessage());
             }
-        return false;
     }
 
     public void setMemory(double memory) {

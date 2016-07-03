@@ -24,10 +24,7 @@ package org.wso2.esbMonitor.configuration;
  */
 public class ConfigurationBean {
 
-    private int maxThreadDumps;
-    private int maxHeapDumps;
-    private long threadDumpPeriod;
-    private long heapDumpPeriod;
+
     private long dbTask = 3000;
     private long jvmTask = 3000;
     private long networkTask = 3000;
@@ -42,29 +39,29 @@ public class ConfigurationBean {
     private int pingReceivingPort =9090;
     private long pingDelay =3000;
 
-    public int getMaxHeapDumps() {
-        return maxHeapDumps;
-    }
-
-    public void setMaxHeapDumps(int maxHeapDumps) {
-        this.maxHeapDumps = maxHeapDumps;
-    }
-
-    public long getThreadDumpPeriod() {
-        return threadDumpPeriod;
-    }
-
-    public void setThreadDumpPeriod(long threadDumpPeriod) {
-        this.threadDumpPeriod = threadDumpPeriod;
-    }
-
-    public long getHeapDumpPeriod() {
-        return heapDumpPeriod;
-    }
-
-    public void setHeapDumpPeriod(long heapDumpPeriod) {
-        this.heapDumpPeriod = heapDumpPeriod;
-    }
+//    public int getMaxHeapDumps() {
+//        return maxHeapDumps;
+//    }
+//
+//    public void setMaxHeapDumps(int maxHeapDumps) {
+//        this.maxHeapDumps = maxHeapDumps;
+//    }
+//
+//    public long getThreadDumpPeriod() {
+//        return threadDumpPeriod;
+//    }
+//
+//    public void setThreadDumpPeriod(long threadDumpPeriod) {
+//        this.threadDumpPeriod = threadDumpPeriod;
+//    }
+//
+//    public long getHeapDumpPeriod() {
+//        return heapDumpPeriod;
+//    }
+//
+//    public void setHeapDumpPeriod(long heapDumpPeriod) {
+//        this.heapDumpPeriod = heapDumpPeriod;
+//    }
 
     public long getDbTask() {
         return dbTask;

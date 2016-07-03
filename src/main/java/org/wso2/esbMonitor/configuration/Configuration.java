@@ -20,15 +20,7 @@
 package org.wso2.esbMonitor.configuration;
 
 import org.apache.log4j.Logger;
-import org.wso2.esbMonitor.connector.RemoteConnector;
-import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
-import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
 import org.wso2.esbMonitor.esbEvents.ESBEvent;
-import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
-import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
-import org.wso2.esbMonitor.network.PassThruHTTPSenderAndReciever;
-import org.wso2.esbMonitor.pingReceiver.PingHandler;
-import org.wso2.esbMonitor.tasks.*;
 
 import java.io.InputStream;
 import java.util.*;
@@ -44,9 +36,9 @@ public class Configuration {
     private ConfigurationBean configurationBean;
     private EventConfiguration eventConfiguration;
 
-    private String JMXURL="service:jmx:rmi://localhost:11111/jndi/rmi://localhost:9999/jmxrmi";
-    private String USERNAME="admin";
-    private String PASSWORD="admin";
+    private String jmxurl ="service:jmx:rmi://localhost:11111/jndi/rmi://localhost:9999/jmxrmi";
+    private String username ="admin";
+    private String password ="admin";
 
     private Map<ESBEvent,EventConfiguration> eventConfigurations = new HashMap<>();
 
@@ -62,9 +54,9 @@ public class Configuration {
 //        CPULoadMonitor.setCpuLoad(CPU_USAGE);
 //        PassThruHTTPSenderAndReciever.setMaxQueueSize(MAX_REQESTQUEUE_SIZE);
 //        PassThruHTTPSenderAndReciever.setMaxThreadCount(HTTP_REQUESTS);
-//        RemoteConnector.setJmxurl(JMXURL);
-//        RemoteConnector.setUsername(USERNAME);
-//        RemoteConnector.setPassword(PASSWORD);
+//        RemoteConnector.setJmxurl(jmxurl);
+//        RemoteConnector.setUsername(username);
+//        RemoteConnector.setPassword(password);
 //        DBCleanerTask.setWaitTime(DB_CLEANER_TASK);
 //        ThreadDumpCreator.setFilePath(THREAD_DUMP_PATH);
 //        PingHandler.setPort(PING_RECEIVING_PORT);
@@ -128,18 +120,18 @@ public class Configuration {
             }
 
             if(prop.getProperty("JMX_SERVICE_URL") != null){
-                JMXURL=prop.getProperty("JMX_SERVICE_URL");
-                logger.info("Added JMX URL" + JMXURL);
+                jmxurl =prop.getProperty("JMX_SERVICE_URL");
+                logger.info("Added JMX URL" + jmxurl);
             }
 
             if(prop.getProperty("JMX_USER") != null){
-                USERNAME=prop.getProperty("JMX_USER");
-                logger.info("Added JMX user "+USERNAME);
+                username =prop.getProperty("JMX_USER");
+                logger.info("Added JMX user "+ username);
             }
 
             if(prop.getProperty("JMX_USER_PASSWORD") != null){
-                PASSWORD=prop.getProperty("JMX_USER_PASSWORD");
-                logger.info("Added JMX user password"+PASSWORD);
+                password =prop.getProperty("JMX_USER_PASSWORD");
+                logger.info("Added JMX user password"+ password);
             }
 
             if(prop.getProperty("DB_CLEANER_TASK") != null){
@@ -162,6 +154,9 @@ public class Configuration {
                 logger.info("Added ping delay " + configurationBean.getPingDelay());
             }
 
+            EventConfiguration eventConfiguration = new EventConfiguration(ESBEvent.OOM_EVENT,"wso2esbfrOOMevent.prperties");
+            eventConfigurations.put(ESBEvent.OOM_EVENT,eventConfiguration);
+
 
 
         }catch (Exception e){
@@ -170,16 +165,16 @@ public class Configuration {
 
     }
 
-    public String getJMXURL() {
-        return JMXURL;
+    public String getJmxurl() {
+        return jmxurl;
     }
 
-    public String getUSERNAME() {
-        return USERNAME;
+    public String getUsername() {
+        return username;
     }
 
-    public String getPASSWORD() {
-        return PASSWORD;
+    public String getPassword() {
+        return password;
     }
 
     public ConfigurationBean getConfigurationBean() {

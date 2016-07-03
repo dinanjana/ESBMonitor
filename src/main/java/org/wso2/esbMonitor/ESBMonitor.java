@@ -39,8 +39,8 @@ public class ESBMonitor {
         config.initProperties();
         DBConnector.initDBConnection();
         PersistenceService.setConn(DBConnector.getConn());
-        RemoteConnector remoteConnector = new RemoteConnector(config.getJMXURL(),
-                config.getPASSWORD(),config.getUSERNAME());
+        RemoteConnector remoteConnector = new RemoteConnector(config.getJmxurl(),
+                config.getPassword(),config.getUsername());
         remoteConnector.createConnection();
         /**
          * Tasks start here
