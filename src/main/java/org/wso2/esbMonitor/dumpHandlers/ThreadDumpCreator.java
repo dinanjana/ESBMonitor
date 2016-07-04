@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
@@ -120,7 +121,7 @@ public class ThreadDumpCreator {
                                             (fileName != null ? "(" + fileName + ")" : "(Unknown Source)"))));
                 }
                 dump.append("\n\n");
-                byte [] data = dump.toString().getBytes();
+                byte [] data = dump.toString().getBytes(Charset.forName("UTF-8"));
                 FileWriter.writeFile(filePath+"ThreadDump"+new Date().toString().replaceAll(":","")+".txt",data);
             }
 

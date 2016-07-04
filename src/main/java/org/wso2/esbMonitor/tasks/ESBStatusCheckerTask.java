@@ -33,8 +33,8 @@ public class ESBStatusCheckerTask extends Thread{
     private boolean status=true;
     private Configuration configuration;
 
-    public ESBStatusCheckerTask(Configuration configuration){
-        this.configuration = configuration;
+    protected ESBStatusCheckerTask(){
+        configuration=Configuration.getInstance();
     }
     private void initTask(){
         this.waitTime = configuration.getConfigurationBean().getPingDelay();

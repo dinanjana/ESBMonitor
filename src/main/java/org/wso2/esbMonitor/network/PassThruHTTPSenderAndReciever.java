@@ -24,6 +24,7 @@ import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
 import org.wso2.esbMonitor.persistance.PersistenceService;
+import org.wso2.esbMonitor.persistance.PersistenceServiceFactory;
 
 import javax.management.*;
 import java.io.IOException;
@@ -84,6 +85,8 @@ public class PassThruHTTPSenderAndReciever {
                 case "org.apache.synapse:Type=Transport,Name=passthru-https-sender":
                     passThruHTTPBean.setType(RequestType.HTTP_SENDER);
                     break;
+                default:
+                    passThruHTTPBean.setType(RequestType.HTTP_SENDER);
             }
 
             logger.info(passThruHTTPBean.getMessageSent() +" "+ passThruHTTPBean.getActiveThreadCount());
@@ -99,7 +102,8 @@ public class PassThruHTTPSenderAndReciever {
                 logger.info("HTTP network load is normal");
             }
             logger.info("Adding network event to scheduledList");
-            PersistenceService.addNetworkEvent(passThruHTTPBean);
+            PersistenceServiceFactory factory = new PersistenceServiceFactory();
+            factory.getPersistenceServiceInstance().addNetworkEvent(passThruHTTPBean);
 
         } catch (MBeanException e) {
             logger.error(e.getMessage());

@@ -22,6 +22,7 @@ package org.wso2.esbMonitor.tasks;
 import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.persistance.PersistenceService;
+import org.wso2.esbMonitor.persistance.PersistenceServiceFactory;
 
 import java.sql.SQLException;
 
@@ -34,8 +35,8 @@ public class DBTaskRunner extends Thread {
     private Logger logger = Logger.getLogger(DBTaskRunner.class);
     private Configuration configuration;
 
-    public DBTaskRunner(Configuration configuration){
-        this.configuration = configuration;
+    protected DBTaskRunner(){
+        configuration=Configuration.getInstance();
     }
 
     private void initTask(){
@@ -44,9 +45,11 @@ public class DBTaskRunner extends Thread {
 
     public void run(){
         initTask();
+        PersistenceServiceFactory factory=new PersistenceServiceFactory();
+        PersistenceService persistenceService=factory.getPersistenceServiceInstance();
         while (true){
             try {
-                PersistenceService.addEventToDB();
+                persistenceService.addEventToDB();
                 Thread.sleep(waitTime);
             } catch (InterruptedException e) {
                 logger.error("Wait error" , e);

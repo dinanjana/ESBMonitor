@@ -22,6 +22,7 @@ package org.wso2.esbMonitor.tasks;
 import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
+import org.wso2.esbMonitor.connector.ConnectorFactory;
 import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
 import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
 
@@ -31,14 +32,15 @@ import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
 public class JVMTaskRunner extends Thread{
 
     private Logger logger = Logger.getLogger(JVMTaskRunner.class);
-    private RemoteConnector remoteConnector;
+    private static RemoteConnector remoteConnector;
     private Configuration configuration;
     private MemoryMonitor memoryMonitor = new MemoryMonitor();
     private CPULoadMonitor cpuLoadMonitor = new CPULoadMonitor();
 
-    public JVMTaskRunner(Configuration configuration,RemoteConnector remoteConnector){
-        this.configuration = configuration;
-        this.remoteConnector= remoteConnector;
+    protected JVMTaskRunner(){
+        configuration = Configuration.getInstance();
+        ConnectorFactory connectorFactory = new ConnectorFactory();
+        remoteConnector= connectorFactory.getRemoteConnectorInstance();
     }
 
     private void initTask(){

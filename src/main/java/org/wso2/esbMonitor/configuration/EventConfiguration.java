@@ -19,27 +19,65 @@
 
 package org.wso2.esbMonitor.configuration;
 
+import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.esbEvents.ESBEvent;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * Created by Dinanjana on 01/07/2016.
  */
 public class EventConfiguration {
 
+    private Logger logger= Logger.getLogger(EventConfiguration.class);
     private String fileName;
     private ESBEvent eventName;
     private int maxThreadDumps=4;
     private int maxHeapDumps=4;
     private long eventPeriod=3000L;
+    private Properties properties;
 
     public EventConfiguration(ESBEvent eventName,String eventConfigFileName){
         this.eventName=eventName;
         this.fileName=eventConfigFileName;
-    }
-    public void initProperties(){}
+        initProperties();
 
-    public void setEventName(ESBEvent eventName) {
-        this.eventName = eventName;
+    }
+    private void initProperties(){
+        readPropFile(fileName);
+        addProperties(properties);
+    }
+
+    private void readPropFile(String fileName){
+        try {
+            properties = new Properties();
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+
+            if (inputStream != null) {
+                properties.load(inputStream);
+            } else {
+                return;
+            }
+
+        }catch (Exception e){
+            logger.error("Property file error",e);
+        }
+    }
+
+    private void addProperties(Properties prop){
+        if(prop.getProperty("MAX_HEAP_DUMPS") != null){
+            maxHeapDumps = Integer.parseInt(prop.getProperty("MAX_HEAP_DUMPS"));
+            logger.info("Added max heap dumps ="+ getMaxHeapDumps()+" for "+eventName);
+        }
+        if(prop.getProperty("MAX_THREAD_DUMPS") != null){
+            maxThreadDumps = Integer.parseInt(prop.getProperty("MAX_THREAD_DUMPS"));
+            logger.info("Added max Thread dumps ="+ getMaxThreadDumps()+" for "+eventName);
+        }
+        if(prop.getProperty("EVENT_PERIOD") != null){
+            maxThreadDumps = Integer.parseInt(prop.getProperty("EVENT_PERIOD"));
+            logger.info("Added max event period  ="+ getMaxThreadDumps()+" for "+eventName);
+        }
+
     }
 
     public int getMaxThreadDumps() {

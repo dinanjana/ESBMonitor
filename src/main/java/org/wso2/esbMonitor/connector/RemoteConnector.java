@@ -45,7 +45,7 @@ public class RemoteConnector {
     private String username;
     private String password;
 
-    public RemoteConnector(String jmxurl,String password,String username){
+    protected RemoteConnector(String jmxurl,String password,String username){
         this.jmxurl=jmxurl;
         this.password=password;
         this.username=username;

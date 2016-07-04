@@ -34,135 +34,123 @@ public class Configuration {
     private Logger logger = Logger.getLogger(Configuration.class);
     private final String FILE_NAME = "wso2esbfr.properties";
     private ConfigurationBean configurationBean;
-    private EventConfiguration eventConfiguration;
-
     private String jmxurl ="service:jmx:rmi://localhost:11111/jndi/rmi://localhost:9999/jmxrmi";
     private String username ="admin";
     private String password ="admin";
-
     private Map<ESBEvent,EventConfiguration> eventConfigurations = new HashMap<>();
+    private Properties properties;
+    private static Configuration instance;
 
 
-    public void initProperties(){
-        configurationBean = new ConfigurationBean();
-        readPropFile();
-//        DBTaskRunner.setWaitTime(DB_TASK);
-//        JVMTaskRunner.setWaitTime(JVM_TASK);
-//        NetworkMonitor.setWaitTime(NETWORK_TASK);
-//        HeapDumper.setFileName(HEAP_DUMP_PATH+"/");
-//        MemoryMonitor.setMemory(MEMORY_USAGE);
-//        CPULoadMonitor.setCpuLoad(CPU_USAGE);
-//        PassThruHTTPSenderAndReciever.setMaxQueueSize(MAX_REQESTQUEUE_SIZE);
-//        PassThruHTTPSenderAndReciever.setMaxThreadCount(HTTP_REQUESTS);
-//        RemoteConnector.setJmxurl(jmxurl);
-//        RemoteConnector.setUsername(username);
-//        RemoteConnector.setPassword(password);
-//        DBCleanerTask.setWaitTime(DB_CLEANER_TASK);
-//        ThreadDumpCreator.setFilePath(THREAD_DUMP_PATH);
-//        PingHandler.setPort(PING_RECEIVING_PORT);
-//        ESBStatusCheckerTask.setWaitTime(PING_DELAY);
+    private Configuration(){
+
     }
 
-    private void readPropFile(){
+    public static synchronized Configuration getInstance(){
+        if(instance==null){
+            instance=new Configuration();
+            instance.configurationBean = new ConfigurationBean();
+            instance.readPropFile(instance.FILE_NAME);
+            instance.addProperties(instance.properties);
+        }
+        return instance;
+
+    }
+
+    private void readPropFile(String fileName){
         try {
-            Properties prop = new Properties();
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(FILE_NAME);
-
+            instance.properties = new Properties();
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
             if (inputStream != null) {
-                prop.load(inputStream);
-            } else {
-                return;
+                properties.load(inputStream);
             }
-
-            if(prop.getProperty("DB_TASK_INTERVAL") != null){
-                configurationBean.setDbTask(Long.parseLong(prop.getProperty("DB_TASK_INTERVAL")));
-                logger.info("Added db task interval "+ configurationBean.getDbTask());
-            }
-
-            if(prop.getProperty("JVM_TASK_INTERVAL")!= null){
-                configurationBean.setJvmTask(Long.parseLong(prop.getProperty("JVM_TASK_INTERVAL")));
-                logger.info("Added jvm task interval "+ configurationBean.getJvmTask());
-            }
-
-            if(prop.getProperty("NETWORK_TASK_INTERVAL") != null){
-                configurationBean.setNetworkTask(Long.parseLong(prop.getProperty("NETWORK_TASK_INTERVAL")));
-                logger.info("Added network task interval "+ configurationBean.getNetworkTask());
-            }
-
-            if(prop.getProperty("HEAP_DUMP_PATH") != null){
-                configurationBean.setHeapDumpPath(prop.getProperty("HEAP_DUMP_PATH"));
-                logger.info("Added heap dump path "+ configurationBean.getHeapDumpPath());
-            }
-
-            if(prop.getProperty("EMAIL_ADDRESS")!= null){
-                configurationBean.setEmailAddress(prop.getProperty("EMAIL_ADDRESS"));
-                logger.info("Added Email address "+ configurationBean.getEmailAddress());
-            }
-
-            if(prop.getProperty("MAX_MEMORY_USAGE")!= null){
-                configurationBean.setMemoryUsage(Double.parseDouble(prop.getProperty("MAX_MEMORY_USAGE")));
-                logger.info("Added max memory usage "+ configurationBean.getEmailAddress());
-            }
-
-            if(prop.getProperty("MAX_CPU_USAGE")!=null){
-                configurationBean.setCpuUsage(Double.parseDouble(prop.getProperty("MAX_CPU_USAGE")));
-                logger.info("Added max CPU usage " + configurationBean.getCpuUsage());
-            }
-
-            if(prop.getProperty("MAX_REQUEST_QUEUE_SIZE") != null){
-                configurationBean.setMaxReqestqueueSize(Integer.parseInt(prop.getProperty("MAX_REQUEST_QUEUE_SIZE")));
-                logger.info("Added max request queue size "+configurationBean.getMaxReqestqueueSize());
-            }
-
-            if(prop.getProperty("MAX_HTTP_REQUESTS") != null){
-                configurationBean.setHttpRequests(Integer.parseInt(prop.getProperty("MAX_HTTP_REQUESTS")));
-                logger.info("Added max http requests "+ configurationBean.getHttpRequests());
-            }
-
-            if(prop.getProperty("JMX_SERVICE_URL") != null){
-                jmxurl =prop.getProperty("JMX_SERVICE_URL");
-                logger.info("Added JMX URL" + jmxurl);
-            }
-
-            if(prop.getProperty("JMX_USER") != null){
-                username =prop.getProperty("JMX_USER");
-                logger.info("Added JMX user "+ username);
-            }
-
-            if(prop.getProperty("JMX_USER_PASSWORD") != null){
-                password =prop.getProperty("JMX_USER_PASSWORD");
-                logger.info("Added JMX user password"+ password);
-            }
-
-            if(prop.getProperty("DB_CLEANER_TASK") != null){
-                configurationBean.setDbCleanerTask(Long.parseLong(prop.getProperty("DB_CLEANER_TASK")));
-                logger.info("Added DB cleaner task wait time "+ configurationBean.getDbCleanerTask());
-            }
-
-            if(prop.getProperty("THREAD_DUMP_PATH") != null){
-                configurationBean.setThreadDumpPath(prop.getProperty("THREAD_DUMP_PATH"));
-                logger.info("Added thread dump path" + configurationBean.getThreadDumpPath());
-            }
-
-            if(prop.getProperty("PING_RECEIVING_PORT") != null){
-                configurationBean.setPingReceivingPort(Integer.parseInt(prop.getProperty("PING_RECEIVING_PORT")));
-                logger.info("Added ping receiving port " + configurationBean.getPingReceivingPort());
-            }
-
-            if(prop.getProperty("PING_DELAY") != null){
-                configurationBean.setPingDelay(Long.parseLong(prop.getProperty("PING_DELAY")));
-                logger.info("Added ping delay " + configurationBean.getPingDelay());
-            }
-
-            EventConfiguration eventConfiguration = new EventConfiguration(ESBEvent.OOM_EVENT,"wso2esbfrOOMevent.prperties");
-            eventConfigurations.put(ESBEvent.OOM_EVENT,eventConfiguration);
-
-
-
         }catch (Exception e){
             logger.error("Property file error",e);
         }
+    }
 
+    private void addProperties(Properties prop){
+        if(prop.getProperty("DB_TASK_INTERVAL") != null){
+            instance.configurationBean.setDbTask(Long.parseLong(prop.getProperty("DB_TASK_INTERVAL")));
+            logger.info("Added db task interval "+ configurationBean.getDbTask());
+        }
+
+        if(prop.getProperty("JVM_TASK_INTERVAL")!= null){
+            instance.configurationBean.setJvmTask(Long.parseLong(prop.getProperty("JVM_TASK_INTERVAL")));
+            logger.info("Added jvm task interval "+ configurationBean.getJvmTask());
+        }
+
+        if(prop.getProperty("NETWORK_TASK_INTERVAL") != null){
+            instance.configurationBean.setNetworkTask(Long.parseLong(prop.getProperty("NETWORK_TASK_INTERVAL")));
+            logger.info("Added network task interval "+ configurationBean.getNetworkTask());
+        }
+
+        if(prop.getProperty("HEAP_DUMP_PATH") != null){
+            instance.configurationBean.setHeapDumpPath(prop.getProperty("HEAP_DUMP_PATH"));
+            logger.info("Added heap dump path "+ configurationBean.getHeapDumpPath());
+        }
+
+        if(prop.getProperty("EMAIL_ADDRESS")!= null){
+            instance.configurationBean.setEmailAddress(prop.getProperty("EMAIL_ADDRESS"));
+            logger.info("Added Email address "+ configurationBean.getEmailAddress());
+        }
+
+        if(prop.getProperty("MAX_MEMORY_USAGE")!= null){
+            instance.configurationBean.setMemoryUsage(Double.parseDouble(prop.getProperty("MAX_MEMORY_USAGE")));
+            logger.info("Added max memory usage "+ configurationBean.getEmailAddress());
+        }
+
+        if(prop.getProperty("MAX_CPU_USAGE")!=null){
+            instance.configurationBean.setCpuUsage(Double.parseDouble(prop.getProperty("MAX_CPU_USAGE")));
+            logger.info("Added max CPU usage " + configurationBean.getCpuUsage());
+        }
+
+        if(prop.getProperty("MAX_REQUEST_QUEUE_SIZE") != null){
+            instance.configurationBean.setMaxReqestqueueSize(Integer.parseInt(prop.getProperty("MAX_REQUEST_QUEUE_SIZE")));
+            logger.info("Added max request queue size "+configurationBean.getMaxReqestqueueSize());
+        }
+
+        if(prop.getProperty("MAX_HTTP_REQUESTS") != null){
+            instance.configurationBean.setHttpRequests(Integer.parseInt(prop.getProperty("MAX_HTTP_REQUESTS")));
+            logger.info("Added max http requests "+ configurationBean.getHttpRequests());
+        }
+
+        if(prop.getProperty("JMX_SERVICE_URL") != null){
+            instance.jmxurl =prop.getProperty("JMX_SERVICE_URL");
+            logger.info("Added JMX URL" + jmxurl);
+        }
+
+        if(prop.getProperty("JMX_USER") != null){
+            instance.username =prop.getProperty("JMX_USER");
+            logger.info("Added JMX user "+ username);
+        }
+
+        if(prop.getProperty("JMX_USER_PASSWORD") != null){
+            instance.password =prop.getProperty("JMX_USER_PASSWORD");
+            logger.info("Added JMX user password"+ password);
+        }
+
+        if(prop.getProperty("DB_CLEANER_TASK") != null){
+            instance.configurationBean.setDbCleanerTask(Long.parseLong(prop.getProperty("DB_CLEANER_TASK")));
+            logger.info("Added DB cleaner task wait time "+ configurationBean.getDbCleanerTask());
+        }
+
+        if(prop.getProperty("THREAD_DUMP_PATH") != null){
+            instance.configurationBean.setThreadDumpPath(prop.getProperty("THREAD_DUMP_PATH"));
+            logger.info("Added thread dump path" + configurationBean.getThreadDumpPath());
+        }
+
+        if(prop.getProperty("PING_RECEIVING_PORT") != null){
+            instance.configurationBean.setPingReceivingPort(Integer.parseInt(prop.getProperty("PING_RECEIVING_PORT")));
+            logger.info("Added ping receiving port " + configurationBean.getPingReceivingPort());
+        }
+
+        if(prop.getProperty("PING_DELAY") != null){
+            instance.configurationBean.setPingDelay(Long.parseLong(prop.getProperty("PING_DELAY")));
+            logger.info("Added ping delay " + configurationBean.getPingDelay());
+        }
+        EventConfiguration eventConfiguration = new EventConfiguration(ESBEvent.OOM_EVENT,"wso2esbfrOOMevent.properties");
+        instance.eventConfigurations.put(ESBEvent.OOM_EVENT,eventConfiguration);
     }
 
     public String getJmxurl() {

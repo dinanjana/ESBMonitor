@@ -22,6 +22,7 @@ package org.wso2.esbMonitor.tasks;
 import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
+import org.wso2.esbMonitor.connector.ConnectorFactory;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
 import org.wso2.esbMonitor.network.PassThruHTTPSenderAndReciever;
 
@@ -38,13 +39,12 @@ public class NetworkMonitor extends Thread {
     private PassThruHTTPSenderAndReciever passThruHTTPSReciever;
     private RemoteConnector remoteConnector;
     private ThreadDumpCreator threadDumpCreator;
-    //needs to be initialized from a property file
     private long waitTime;
 
-
-    public NetworkMonitor(Configuration config,RemoteConnector remote){
-        this.config = config;
-        this.remoteConnector = remote;
+    protected NetworkMonitor(){
+        config=Configuration.getInstance();
+        ConnectorFactory connectorFactory = new ConnectorFactory();
+        remoteConnector = connectorFactory.getRemoteConnectorInstance();
     }
     private void initTask(){
         waitTime=config.getConfigurationBean().getNetworkTask();

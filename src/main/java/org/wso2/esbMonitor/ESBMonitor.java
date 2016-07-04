@@ -22,7 +22,9 @@ package org.wso2.esbMonitor;
 import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.DBConnector;
 import org.wso2.esbMonitor.connector.RemoteConnector;
+import org.wso2.esbMonitor.connector.ConnectorFactory;
 import org.wso2.esbMonitor.persistance.PersistenceService;
+import org.wso2.esbMonitor.persistance.PersistenceServiceFactory;
 import org.wso2.esbMonitor.pingReceiver.PingHandler;
 import org.wso2.esbMonitor.tasks.*;
 
@@ -35,13 +37,22 @@ public class ESBMonitor {
 
       public static void main(String[] args) throws IOException {
 
-        Configuration config = new Configuration();
-        config.initProperties();
-        DBConnector.initDBConnection();
-        PersistenceService.setConn(DBConnector.getConn());
-        RemoteConnector remoteConnector = new RemoteConnector(config.getJmxurl(),
-                config.getPassword(),config.getUsername());
-        remoteConnector.createConnection();
+          Configuration config = Configuration.getInstance();
+          //initializing factory classes
+          ConnectorFactory connectorFactory = new ConnectorFactory();
+          TaskFactory taskFactory = new TaskFactory();
+          PersistenceServiceFactory persistenceServiceFactory = new PersistenceServiceFactory();
+
+          connectorFactory.createRemoteConnector(config.getJmxurl(),
+                  config.getPassword(), config.getUsername());
+          RemoteConnector remoteConnector = connectorFactory.getRemoteConnectorInstance();
+          remoteConnector.createConnection();
+          DBConnector dbConnector =connectorFactory.getDbConnectorFactory();
+          dbConnector.initDBConnection();
+          persistenceServiceFactory.getPersistenceServiceInstance().
+                setConn(dbConnector.getConn());
+
+
         /**
          * Tasks start here
          *  1)JVM monitor
@@ -52,17 +63,17 @@ public class ESBMonitor {
          *  6)ESB status monitor
          *  */
 
-        JVMTaskRunner jvmTaskRunner = new JVMTaskRunner(config,remoteConnector);
+        JVMTaskRunner jvmTaskRunner = taskFactory.getJvmTaskRunnerInstance();
+        NetworkMonitor networkMonitor = taskFactory.getNetworkMonitorInstance();
+        DBTaskRunner dbTaskRunner = taskFactory.getDbTaskRunnerInstance();
+        DBCleanerTask dbCleanerTask= taskFactory.getDbCleanerTaskInstance();
+        ESBStatusCheckerTask esbStatusCheckerTask = taskFactory.getEsbStatusCheckerTaskInstance();
         jvmTaskRunner.start();
-        NetworkMonitor networkMonitor = new NetworkMonitor(config,remoteConnector);
         networkMonitor.start();
-        DBTaskRunner dbTaskRunner =new DBTaskRunner(config);
         dbTaskRunner.start();
-        DBCleanerTask dbCleanerTask=new DBCleanerTask(config);
         dbCleanerTask.start();
-        new PingHandler().start();
-        ESBStatusCheckerTask esbStatusCheckerTask = new ESBStatusCheckerTask(config);
         esbStatusCheckerTask.start();
+        new PingHandler().start();
 
     }
 }

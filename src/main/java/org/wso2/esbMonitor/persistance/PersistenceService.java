@@ -34,43 +34,53 @@ import java.util.ArrayList;
  */
 public class PersistenceService {
 
-    private static Logger logger= Logger.getLogger(PersistenceService.class);
-    private static Connection conn;
-    private static ArrayList<PassThruHTTPBean> scheduledList
+    private Logger logger= Logger.getLogger(PersistenceService.class);
+    private Connection conn;
+    private ArrayList<PassThruHTTPBean> scheduledList
             = new ArrayList<>();
 
-    public synchronized static void addNetworkEvent(PassThruHTTPBean passThruHTTPBean){
+    public synchronized void addNetworkEvent(PassThruHTTPBean passThruHTTPBean){
         logger.info("Adding event :{}"+ passThruHTTPBean.getActiveThreadCount() +"Size :{}" +scheduledList.size());
         scheduledList.add(passThruHTTPBean);
     }
 
-    public static synchronized void addEventToDB() throws SQLException {
+    public synchronized void addEventToDB() throws SQLException {
         Statement stmt = conn.createStatement();
-        for(PassThruHTTPBean passThruHTTPBean:scheduledList){
-            stmt.executeUpdate("INSERT INTO HTTP_LOG VALUES (" + passThruHTTPBean.getActiveThreadCount() + ","
-                    + passThruHTTPBean.getAvgSizeRecieved() + "," +
-                    passThruHTTPBean.getAvgSizeSent() + "," +
-                    passThruHTTPBean.getFaultsRecieving() + "," +
-                    passThruHTTPBean.getFaultSending() + "," +
-                    passThruHTTPBean.getMessagesRecieved() + "," +
-                    passThruHTTPBean.getMessageSent() + "," +
-                    passThruHTTPBean.getQueueSize() + ",'" +
-                    new Timestamp(passThruHTTPBean.getDate().getTime()).toString() + "'," +
-                    RequestType.getId(passThruHTTPBean.getType()) +
-                    " ) ");
+        try {
+            for(PassThruHTTPBean passThruHTTPBean:scheduledList){
+                stmt.executeUpdate("INSERT INTO HTTP_LOG VALUES (" + passThruHTTPBean.getActiveThreadCount() + ","
+                        + passThruHTTPBean.getAvgSizeRecieved() + "," +
+                        passThruHTTPBean.getAvgSizeSent() + "," +
+                        passThruHTTPBean.getFaultsRecieving() + "," +
+                        passThruHTTPBean.getFaultSending() + "," +
+                        passThruHTTPBean.getMessagesRecieved() + "," +
+                        passThruHTTPBean.getMessageSent() + "," +
+                        passThruHTTPBean.getQueueSize() + ",'" +
+                        new Timestamp(passThruHTTPBean.getDate().getTime()).toString() + "'," +
+                        RequestType.getId(passThruHTTPBean.getType()) +
+                        " ) ");
+            }
+        }catch (Exception e){
+            logger.error("Error",e);
+        }finally {
+            scheduledList.clear();
+            stmt.close();
         }
-        scheduledList.clear();
-        stmt.close();
     }
 
-    public static synchronized void cleanDBTables() throws SQLException {
+    public synchronized void cleanDBTables() throws SQLException {
         String tableName = "HTTP_LOG";
         Statement stmt = conn.createStatement();
-        stmt.execute("TRUNCATE TABLE "+ tableName);
-        stmt.close();
+        try{
+            stmt.execute("TRUNCATE TABLE "+ tableName);
+        }catch (Exception e){
+            logger.error("Error",e);
+        }finally {
+            stmt.close();
+        }
     }
 
-    public static void setConn(Connection conn) {
-        PersistenceService.conn = conn;
+    public void setConn(Connection conn) {
+        this.conn = conn;
     }
 }

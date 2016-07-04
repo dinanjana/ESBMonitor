@@ -32,12 +32,16 @@ import java.sql.*;
  */
 public class DBConnector {
 
-    private static final String protocol = "jdbc:derby:";
-    private static String dbName = "wso2FlightRecorder";
-    private static Connection conn ;
-    private static Logger logger = Logger.getLogger(DBConnector.class);
+    private final String protocol = "jdbc:derby:";
+    private String dbName = "wso2FlightRecorder";
+    private Connection conn ;
+    private Logger logger = Logger.getLogger(DBConnector.class);
 
-    public static void initDBConnection() {
+    protected DBConnector(){
+
+    }
+
+    public void initDBConnection() {
         try {
             conn = DriverManager.getConnection(protocol + dbName
                     + ";create=true");
@@ -55,7 +59,7 @@ public class DBConnector {
         }
     }
 
-    public static void closeDBConnection()  {
+    public void closeDBConnection()  {
         try {
             DriverManager.getConnection("jdbc:derby:;shutdown=true");
         } catch (SQLException e) {
@@ -73,7 +77,7 @@ public class DBConnector {
 
     }
 
-    public static Connection getConn() {
+    public Connection getConn() {
         return conn;
     }
 

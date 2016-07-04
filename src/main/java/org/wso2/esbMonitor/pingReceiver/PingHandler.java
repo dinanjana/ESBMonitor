@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 
 /**
  * Created by Dinanjana on 19/06/2016.
@@ -50,7 +51,7 @@ public class PingHandler extends Thread{
             String response = "Ping received";
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
-            os.write(response.getBytes());
+            os.write(response.getBytes(Charset.forName("UTF-8")));
             os.close();
         }
 

@@ -32,7 +32,7 @@ import java.lang.management.OperatingSystemMXBean;
  */
 public class CPULoadMonitor {
     final static Logger logger = Logger.getLogger(CPULoadMonitor.class);
-    private static ObjectName bean = null;
+    private ObjectName bean = null;
     private RemoteConnector remote;
     private final String OBJECT_NAME="java.lang:type=OperatingSystem";
     //needs to be initialized from a property file
