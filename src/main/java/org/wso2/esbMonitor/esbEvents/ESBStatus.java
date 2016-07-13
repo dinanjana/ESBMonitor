@@ -22,11 +22,11 @@ package org.wso2.esbMonitor.esbEvents;
 /**
  * Created by Dinanjana on 28/06/2016.
  */
-public enum ESBEvent {
+public enum ESBStatus {
     OOM_EVENT(0);
     private int id;
 
-    private ESBEvent(int id){
+    private ESBStatus(int id){
         this.id = id;
     }
 }

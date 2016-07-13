@@ -20,7 +20,7 @@
 package org.wso2.esbMonitor.configuration;
 
 import org.apache.log4j.Logger;
-import org.wso2.esbMonitor.esbEvents.ESBEvent;
+import org.wso2.esbMonitor.esbEvents.ESBStatus;
 
 import java.io.InputStream;
 import java.util.*;
@@ -37,7 +37,7 @@ public class Configuration {
     private String jmxurl ="service:jmx:rmi://localhost:11111/jndi/rmi://localhost:9999/jmxrmi";
     private String username ="admin";
     private String password ="admin";
-    private Map<ESBEvent,EventConfiguration> eventConfigurations = new HashMap<>();
+    private Map<ESBStatus,EventConfiguration> eventConfigurations = new HashMap<>();
     private Properties properties;
     private static Configuration instance;
 
@@ -149,8 +149,8 @@ public class Configuration {
             instance.configurationBean.setPingDelay(Long.parseLong(prop.getProperty("PING_DELAY")));
             logger.info("Added ping delay " + configurationBean.getPingDelay());
         }
-        EventConfiguration eventConfiguration = new EventConfiguration(ESBEvent.OOM_EVENT,"wso2esbfrOOMevent.properties");
-        instance.eventConfigurations.put(ESBEvent.OOM_EVENT,eventConfiguration);
+        EventConfiguration eventConfiguration = new EventConfiguration(ESBStatus.OOM_EVENT,"wso2esbfrOOMevent.properties");
+        instance.eventConfigurations.put(ESBStatus.OOM_EVENT,eventConfiguration);
     }
 
     public String getJmxurl() {
@@ -169,7 +169,7 @@ public class Configuration {
         return configurationBean;
     }
 
-    public Map<ESBEvent, EventConfiguration> getEventConfigurations() {
+    public Map<ESBStatus, EventConfiguration> getEventConfigurations() {
         return eventConfigurations;
     }
 }

@@ -20,7 +20,7 @@
 package org.wso2.esbMonitor.configuration;
 
 import org.apache.log4j.Logger;
-import org.wso2.esbMonitor.esbEvents.ESBEvent;
+import org.wso2.esbMonitor.esbEvents.ESBStatus;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -31,13 +31,13 @@ public class EventConfiguration {
 
     private Logger logger= Logger.getLogger(EventConfiguration.class);
     private String fileName;
-    private ESBEvent eventName;
+    private ESBStatus eventName;
     private int maxThreadDumps=4;
     private int maxHeapDumps=4;
     private long eventPeriod=3000L;
     private Properties properties;
 
-    public EventConfiguration(ESBEvent eventName,String eventConfigFileName){
+    public EventConfiguration(ESBStatus eventName,String eventConfigFileName){
         this.eventName=eventName;
         this.fileName=eventConfigFileName;
         initProperties();

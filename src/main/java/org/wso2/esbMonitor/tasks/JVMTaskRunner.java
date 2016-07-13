@@ -25,6 +25,7 @@ import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.connector.ConnectorFactory;
 import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
 import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
+import org.wso2.esbMonitor.reporting.ReportCreator;
 
 /**
  * Created by Dinanjana on 30/05/2016.
@@ -36,6 +37,7 @@ public class JVMTaskRunner extends Thread{
     private Configuration configuration;
     private MemoryMonitor memoryMonitor = new MemoryMonitor();
     private CPULoadMonitor cpuLoadMonitor = new CPULoadMonitor();
+    private ReportCreator reportCreator = new ReportCreator(memoryMonitor,cpuLoadMonitor);
 
     protected JVMTaskRunner(){
         configuration = Configuration.getInstance();
@@ -47,9 +49,12 @@ public class JVMTaskRunner extends Thread{
         memoryMonitor.setRemote(remoteConnector);
         memoryMonitor.setMemory(configuration.getConfigurationBean().getMemoryUsage());
         memoryMonitor.setConfig(configuration);
+        memoryMonitor.initMonitor();
+        memoryMonitor.addObserver(reportCreator);
         cpuLoadMonitor.setRemote(remoteConnector);
         cpuLoadMonitor.setCpuLoad(configuration.getConfigurationBean().getCpuUsage());
         cpuLoadMonitor.setConfig(configuration);
+
     }
 
     public void run(){

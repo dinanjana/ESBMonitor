@@ -52,10 +52,12 @@ public class HeapDumper extends Thread {
     private String fileName = "heap//";
     private RemoteConnector remoteConnector;
     private Configuration config;
+    private String heapDumpName;
 
     public HeapDumper(Configuration config,RemoteConnector remoteConnector){
         this.remoteConnector=remoteConnector;
         this.config=config;
+        this.heapDumpName="HeapDump "+new Date().toString().replaceAll(":","")+".bin";
     }
 
     private void dumpHeap(String fileName, boolean live) {
@@ -100,8 +102,7 @@ public class HeapDumper extends Thread {
 
     public void run(){
         // default heap dump file name
-        Date date = new Date();
-        String name = "HeapDump "+date.toString().replaceAll(":","")+".bin";
+        String name =heapDumpName;
         // by default dump only the live objects
         boolean live = true;
         dumpHeap(name,live);
@@ -110,5 +111,9 @@ public class HeapDumper extends Thread {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getHeapDumpName(){
+        return this.heapDumpName;
     }
 }

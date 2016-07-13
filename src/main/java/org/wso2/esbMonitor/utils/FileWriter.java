@@ -32,7 +32,7 @@ import java.nio.file.Paths;
 public class FileWriter {
     private static Logger logger = Logger.getLogger(FileWriter.class);
 
-    public static void writeFile(String fileName,byte [] data){
+    public static synchronized void writeFile(String fileName,byte [] data){
 
         Path file = Paths.get(fileName);
         try {

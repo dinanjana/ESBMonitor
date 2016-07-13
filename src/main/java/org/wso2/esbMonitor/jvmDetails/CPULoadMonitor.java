@@ -40,6 +40,10 @@ public class CPULoadMonitor {
     private Configuration config;
     private ThreadDumpCreator threadDumpCreator=null;
 
+    public void initMonitor(){
+
+    }
+
     public void getMbeanInfo() {
         try {
             bean = new ObjectName(OBJECT_NAME);

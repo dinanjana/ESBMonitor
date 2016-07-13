@@ -46,6 +46,7 @@ public class ThreadDumpCreator {
     private final String THREAD_DUMP_BEAN_NAME = "java.lang:type=Threading";
     private RemoteConnector remoteConnector;
     private Configuration config;
+    private String threadDumpName;
 
     /**
      * For testing purposes only
@@ -122,7 +123,8 @@ public class ThreadDumpCreator {
                 }
                 dump.append("\n\n");
                 byte [] data = dump.toString().getBytes(Charset.forName("UTF-8"));
-                FileWriter.writeFile(filePath+"ThreadDump"+new Date().toString().replaceAll(":","")+".txt",data);
+                threadDumpName="ThreadDump"+new Date().toString().replaceAll(":","")+".txt";
+                FileWriter.writeFile(filePath+threadDumpName,data);
             }
 
         } catch (MalformedObjectNameException e) {
@@ -143,6 +145,10 @@ public class ThreadDumpCreator {
         finally {
             threadDumpInProgress = false;
         }
+    }
+
+    public String getThreadDumpName(){
+        return this.threadDumpName;
     }
 
     public boolean isThreadDumpInProgress() {

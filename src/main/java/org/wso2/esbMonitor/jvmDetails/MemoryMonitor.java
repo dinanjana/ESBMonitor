@@ -25,18 +25,21 @@ import org.wso2.esbMonitor.configuration.EventConfiguration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
-import org.wso2.esbMonitor.esbEvents.ESBEvent;
-
+import org.wso2.esbMonitor.esbEvents.ESBStatus;
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Observable;
 
 
 /**
  * Created by Dinanjana
  * on 30/04/2016.
  */
-public class MemoryMonitor{
+public class MemoryMonitor extends Observable{
 
     final Logger logger = Logger.getLogger(MemoryMonitor.class);
     private double memory;
@@ -47,16 +50,24 @@ public class MemoryMonitor{
     private Configuration config;
     private int maxNumOfThreadDumps;
     private int maxNumOfHeapDumps;
+    private long eventStartTime;
     private long eventEndTime;
+    private long eventPeriod;
     private long threadDumpsCreated;
     private long heapDumpsCreated;
     private boolean eventDetected=false;
+    private List <String> threadDumpsNames = new ArrayList<>();
+    private List<String> heapDumpsNames = new ArrayList<>();
+
+    public void initMonitor(){
+        EventConfiguration eventConfiguration = config.getEventConfigurations().get(ESBStatus.OOM_EVENT);
+        maxNumOfHeapDumps=eventConfiguration.getMaxHeapDumps();
+        maxNumOfThreadDumps=eventConfiguration.getMaxThreadDumps();
+        eventPeriod =eventConfiguration.getEventPeriod();
+    }
 
     public void getMbeanInfo() {
-
-            //bean = new ObjectName(OBJECT_NAME);
         checkWarningUsage();
-
     }
 
     private void checkWarningUsage() {
@@ -68,15 +79,10 @@ public class MemoryMonitor{
                 if ((double) usedMemory / maxMemory > memory) {
                     logger.info(":Possible Out of Memory event detected");
                     //Records the new event
-                    // Grab necessary config from config object
                     if(!eventDetected){
-                        EventConfiguration eventConfiguration = config.getEventConfigurations().get(ESBEvent.OOM_EVENT);
-                        maxNumOfHeapDumps=eventConfiguration.getMaxHeapDumps();
-                        maxNumOfThreadDumps=eventConfiguration.getMaxThreadDumps();
-                        eventEndTime=eventConfiguration.getEventPeriod() + System.currentTimeMillis();
+                        eventStartTime=System.currentTimeMillis();
+                        eventEndTime= eventPeriod + System.currentTimeMillis();
                         eventDetected=true;
-                        threadDumpsCreated=0;
-                        heapDumpsCreated=0;
                         //ToDo Send to report module
                         logger.info("New OOM event started.Ends on "+eventEndTime+
                                 " Maximum of "+maxNumOfThreadDumps + " and maximum of "+maxNumOfHeapDumps
@@ -90,11 +96,13 @@ public class MemoryMonitor{
                     if(System.currentTimeMillis() < eventEndTime){
                         if(threadDumpsCreated <= maxNumOfThreadDumps){
                             threadDumpCreator.getMbeanInfo();
+                            threadDumpsNames.add(threadDumpCreator.getThreadDumpName());
                             threadDumpsCreated++;
                             logger.info("Thread dump created");
                         }
                         if(heapDumpsCreated <= maxNumOfHeapDumps){
                             heapDumper = new HeapDumper(config,remote);
+                            heapDumpsNames.add(heapDumper.getHeapDumpName());
                             heapDumper.start();
                             heapDumpsCreated++;
                             logger.info("Heap dump created");
@@ -105,7 +113,13 @@ public class MemoryMonitor{
                 }
                 //Event ends
                 if(System.currentTimeMillis() >= eventEndTime && eventDetected){
+                    setChanged();
+                    notifyObservers();
                     eventDetected=false;
+                    threadDumpsCreated=0;
+                    heapDumpsCreated=0;
+                    threadDumpsNames.clear();
+                    heapDumpsNames.clear();
                     logger.info("Event ended on " +System.currentTimeMillis());
                 }
 
@@ -120,6 +134,23 @@ public class MemoryMonitor{
             } catch (IOException e) {
                 logger.error(e.getMessage());
             }
+    }
+
+    public synchronized String  getValue(){
+        String heapNames="";
+        String threadNames=" ";
+        for(String name:heapDumpsNames){
+            heapNames+=heapNames+" "+name + " ,";
+        }
+        for (String name:threadDumpsNames){
+            threadNames+=threadNames+" "+name+ " ,";
+        }
+        Date date = new Date(eventStartTime);
+        String ret = "OOM Event detected at "+ date+" \n"+heapDumpsCreated + " Heap dumps created.Names of them are "+heapNames+" Available at :"+
+                config.getConfigurationBean().getHeapDumpPath()
+                +"\n"+ threadDumpsCreated + " Thread dumps created. Names of them are "+threadNames +". Available at :"
+                +config.getConfigurationBean().getThreadDumpPath();
+        return ret;
     }
 
     public void setMemory(double memory) {
