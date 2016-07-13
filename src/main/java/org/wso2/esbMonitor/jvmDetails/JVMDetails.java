@@ -19,9 +19,13 @@
 
 package org.wso2.esbMonitor.jvmDetails;
 
+import java.util.Observable;
+
 /**
  * Created by Dinanjana on 29/05/2016.
  */
-public interface JVMDetails {
-    void geMbeanInfo();
+public abstract class JVMDetails extends Observable {
+    abstract void getMbeanInfo();
+    abstract void initMonitor();
+    abstract String getValue();
 }

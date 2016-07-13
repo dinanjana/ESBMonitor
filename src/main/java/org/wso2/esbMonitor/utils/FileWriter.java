@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 /**
  * Created by Dinanjana on 01/06/2016.
@@ -36,7 +37,11 @@ public class FileWriter {
 
         Path file = Paths.get(fileName);
         try {
-            Files.write(file, data);
+            if(Files.exists(file)){
+                Files.write(file, data, StandardOpenOption.APPEND);
+            }else {
+                Files.write(file, data);
+            }
         } catch (IOException e) {
             logger.error("File writing error",e);
         }

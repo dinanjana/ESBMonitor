@@ -23,7 +23,8 @@ package org.wso2.esbMonitor.esbEvents;
  * Created by Dinanjana on 28/06/2016.
  */
 public enum ESBStatus {
-    OOM_EVENT(0);
+    OOM_EVENT(0),
+    HIGH_CPU_LOAD(1);
     private int id;
 
     private ESBStatus(int id){

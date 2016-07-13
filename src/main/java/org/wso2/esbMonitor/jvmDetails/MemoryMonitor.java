@@ -32,14 +32,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Observable;
-
 
 /**
  * Created by Dinanjana
  * on 30/04/2016.
  */
-public class MemoryMonitor extends Observable{
+public class MemoryMonitor extends JVMDetails{
 
     final Logger logger = Logger.getLogger(MemoryMonitor.class);
     private double memory;
@@ -146,8 +144,8 @@ public class MemoryMonitor extends Observable{
             threadNames+=threadNames+" "+name+ " ,";
         }
         Date date = new Date(eventStartTime);
-        String ret = "OOM Event detected at "+ date+" \n"+heapDumpsCreated + " Heap dumps created.Names of them are "+heapNames+" Available at :"+
-                config.getConfigurationBean().getHeapDumpPath()
+        String ret = "\nOOM Event detected at "+ date+" \n"+heapDumpsCreated + " Heap dumps created.Names of them are "+
+                heapNames+" Available at :"+ config.getConfigurationBean().getHeapDumpPath()
                 +"\n"+ threadDumpsCreated + " Thread dumps created. Names of them are "+threadNames +". Available at :"
                 +config.getConfigurationBean().getThreadDumpPath();
         return ret;

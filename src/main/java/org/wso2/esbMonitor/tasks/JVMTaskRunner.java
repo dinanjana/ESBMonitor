@@ -37,23 +37,30 @@ public class JVMTaskRunner extends Thread{
     private Configuration configuration;
     private MemoryMonitor memoryMonitor = new MemoryMonitor();
     private CPULoadMonitor cpuLoadMonitor = new CPULoadMonitor();
-    private ReportCreator reportCreator = new ReportCreator(memoryMonitor,cpuLoadMonitor);
+    private ReportCreator reportCreator;
 
     protected JVMTaskRunner(){
         configuration = Configuration.getInstance();
         ConnectorFactory connectorFactory = new ConnectorFactory();
         remoteConnector= connectorFactory.getRemoteConnectorInstance();
+        reportCreator=ReportCreator.getInstance();
     }
 
     private void initTask(){
+        reportCreator.setMemoryMonitor(memoryMonitor);
+        reportCreator.setCpuLoadMonitor(cpuLoadMonitor);
+
         memoryMonitor.setRemote(remoteConnector);
         memoryMonitor.setMemory(configuration.getConfigurationBean().getMemoryUsage());
         memoryMonitor.setConfig(configuration);
         memoryMonitor.initMonitor();
         memoryMonitor.addObserver(reportCreator);
+
         cpuLoadMonitor.setRemote(remoteConnector);
         cpuLoadMonitor.setCpuLoad(configuration.getConfigurationBean().getCpuUsage());
         cpuLoadMonitor.setConfig(configuration);
+        cpuLoadMonitor.initMonitor();
+        cpuLoadMonitor.addObserver(reportCreator);
 
     }
 
