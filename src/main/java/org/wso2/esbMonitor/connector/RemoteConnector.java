@@ -69,7 +69,7 @@ public class RemoteConnector {
         }
     }
 
-    private void connect() throws IOException {
+    private synchronized void connect() throws IOException {
         JMXServiceURL target = new JMXServiceURL(jmxurl);
         //for passing credentials for password
         Map<String, String[]> env = new HashMap<String, String[]>();

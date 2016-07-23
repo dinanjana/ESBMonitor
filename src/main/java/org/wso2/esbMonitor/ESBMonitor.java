@@ -23,9 +23,14 @@ import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.DBConnector;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.connector.ConnectorFactory;
+import org.wso2.esbMonitor.esbEvents.Event;
+import org.wso2.esbMonitor.esbEvents.events.EventFactory;
+import org.wso2.esbMonitor.esbEvents.events.HighCPULoadEvent;
+import org.wso2.esbMonitor.esbEvents.events.OOMEvent;
 import org.wso2.esbMonitor.persistance.PersistenceService;
 import org.wso2.esbMonitor.persistance.PersistenceServiceFactory;
 import org.wso2.esbMonitor.pingReceiver.PingHandler;
+import org.wso2.esbMonitor.reporting.ReportCreator;
 import org.wso2.esbMonitor.tasks.*;
 
 import java.io.IOException;
@@ -52,6 +57,19 @@ public class ESBMonitor {
           persistenceServiceFactory.getPersistenceServiceInstance().
                 setConn(dbConnector.getConn());
 
+      /**
+       * Registering events for notifications
+       * */
+          //List of observers
+          ReportCreator reportCreator = ReportCreator.getInstance();
+          //List of observable event
+          OOMEvent oomEvent = EventFactory.getOomEventInstance();
+          HighCPULoadEvent highCPULoadEvent=EventFactory.getHighCPULoadEventInstance();
+
+          reportCreator.setOomEvent(oomEvent);
+          reportCreator.setHighCPULoadEvent(highCPULoadEvent);
+          oomEvent.addObserver(reportCreator);
+          highCPULoadEvent.addObserver(reportCreator);
 
         /**
          * Tasks start here

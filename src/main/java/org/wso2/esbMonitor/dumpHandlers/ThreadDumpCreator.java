@@ -128,19 +128,19 @@ public class ThreadDumpCreator {
             }
 
         } catch (MalformedObjectNameException e) {
-            logger.error(e.getMessage());
+            logger.error("Error" , e);
         } catch (InstanceNotFoundException e) {
-            logger.error(e.getMessage());
+            logger.error("Error" , e);
         } catch (IntrospectionException e) {
-            logger.error(e.getMessage());
+            logger.error("Error" , e);
         } catch (ReflectionException e) {
-            logger.error(e.getMessage());
+            logger.error("Error" , e);
         } catch (IOException e) {
-            logger.error(e.getMessage()+" "+e.getStackTrace());
+            logger.error("Error" , e);
         } catch (MBeanException e) {
-            logger.error(e.getMessage());
+            logger.error("Error" , e);
         } catch (AttributeNotFoundException e) {
-            logger.error(e.getMessage());
+            logger.error("Error" , e);
         }
         finally {
             threadDumpInProgress = false;
@@ -155,7 +155,7 @@ public class ThreadDumpCreator {
         return threadDumpInProgress;
     }
 
-    public void setFilePath(String filePath) {
+    public synchronized void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 }
