@@ -58,11 +58,6 @@ public class ReportCreator implements Observer {
 
     @Override
     public synchronized void update(Observable o, Object arg) {
-//        if(o==memoryMonitor && o instanceof MemoryMonitor){
-//            logger.info("Notified observer");
-//            byte[] data = ((MemoryMonitor) o).getValue().getBytes(Charset.forName("UTF-8"));
-//            FileWriter.writeFile("Report.txt",data);
-//        }
         logger.info("Notification received");
         if(o==oomEvent && o instanceof OOMEvent){
             logger.info("OOM Event notified");
@@ -72,6 +67,11 @@ public class ReportCreator implements Observer {
         if(o==highCPULoadEvent && o instanceof HighCPULoadEvent){
             logger.info("Notified observer");
             byte[] data = ((HighCPULoadEvent) o).getValue().getBytes(Charset.forName("UTF-8"));
+            FileWriter.writeFile("Report.txt",data);
+        }
+        if(o==highRequestCountEvent && o instanceof HighRequestCountEvent){
+            logger.info("Notified observer");
+            byte[] data = ((HighRequestCountEvent) o).getValue().getBytes(Charset.forName("UTF-8"));
             FileWriter.writeFile("Report.txt",data);
         }
     }

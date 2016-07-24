@@ -39,4 +39,9 @@ public class UnresponsiveESBEvent extends Event {
     public void resetEvent() {
 
     }
+
+    @Override
+    public String getValue() {
+        return null;
+    }
 }

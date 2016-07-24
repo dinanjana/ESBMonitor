@@ -25,6 +25,7 @@ package org.wso2.esbMonitor.esbEvents.events;
 public class EventFactory {
     private static OOMEvent oomEvent=null;
     private static HighCPULoadEvent highCPULoadEvent=null;
+    private static HighRequestCountEvent highRequestCountEvent=null;
 
     public static OOMEvent getOomEventInstance() {
         if(oomEvent == null){
@@ -38,5 +39,12 @@ public class EventFactory {
             highCPULoadEvent=new HighCPULoadEvent();
         }
         return highCPULoadEvent;
+    }
+
+    public static HighRequestCountEvent getHighRequestCountEventInstance(){
+        if(highRequestCountEvent==null){
+            highRequestCountEvent=new HighRequestCountEvent();
+        }
+        return highRequestCountEvent;
     }
 }

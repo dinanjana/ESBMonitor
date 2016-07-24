@@ -32,8 +32,8 @@ public class ConfigurationBean {
     private String emailAddress;
     private Double memoryUsage = 0.7;
     private Double cpuUsage = 0.7;
-    private int httpRequests = 100;
-    private int maxReqestqueueSize = 100;
+    private int httpRequests = 0;
+    private int maxReqestqueueSize = 0;
     private long dbCleanerTask = 24L;
     private String threadDumpPath ="ThreadDumps//";
     private int pingReceivingPort =9090;

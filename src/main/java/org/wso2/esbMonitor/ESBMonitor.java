@@ -26,6 +26,7 @@ import org.wso2.esbMonitor.connector.ConnectorFactory;
 import org.wso2.esbMonitor.esbEvents.Event;
 import org.wso2.esbMonitor.esbEvents.events.EventFactory;
 import org.wso2.esbMonitor.esbEvents.events.HighCPULoadEvent;
+import org.wso2.esbMonitor.esbEvents.events.HighRequestCountEvent;
 import org.wso2.esbMonitor.esbEvents.events.OOMEvent;
 import org.wso2.esbMonitor.persistance.PersistenceService;
 import org.wso2.esbMonitor.persistance.PersistenceServiceFactory;
@@ -65,11 +66,15 @@ public class ESBMonitor {
           //List of observable event
           OOMEvent oomEvent = EventFactory.getOomEventInstance();
           HighCPULoadEvent highCPULoadEvent=EventFactory.getHighCPULoadEventInstance();
+          HighRequestCountEvent highRequestCountEvent=EventFactory.getHighRequestCountEventInstance();
 
           reportCreator.setOomEvent(oomEvent);
           reportCreator.setHighCPULoadEvent(highCPULoadEvent);
+          reportCreator.setHighRequestCountEvent(highRequestCountEvent);
+
           oomEvent.addObserver(reportCreator);
           highCPULoadEvent.addObserver(reportCreator);
+          highRequestCountEvent.addObserver(reportCreator);
 
         /**
          * Tasks start here
@@ -80,18 +85,17 @@ public class ESBMonitor {
          *  5)Ping receiver
          *  6)ESB status monitor
          *  */
-
-        JVMTaskRunner jvmTaskRunner = taskFactory.getJvmTaskRunnerInstance();
-        NetworkMonitor networkMonitor = taskFactory.getNetworkMonitorInstance();
-        DBTaskRunner dbTaskRunner = taskFactory.getDbTaskRunnerInstance();
-        DBCleanerTask dbCleanerTask= taskFactory.getDbCleanerTaskInstance();
-        ESBStatusCheckerTask esbStatusCheckerTask = taskFactory.getEsbStatusCheckerTaskInstance();
-        jvmTaskRunner.start();
-        networkMonitor.start();
-        dbTaskRunner.start();
-        dbCleanerTask.start();
-        esbStatusCheckerTask.start();
-        new PingHandler().start();
+          JVMTaskRunner jvmTaskRunner = taskFactory.getJvmTaskRunnerInstance();
+          NetworkMonitor networkMonitor = taskFactory.getNetworkMonitorInstance();
+          DBTaskRunner dbTaskRunner = taskFactory.getDbTaskRunnerInstance();
+          DBCleanerTask dbCleanerTask= taskFactory.getDbCleanerTaskInstance();
+          ESBStatusCheckerTask esbStatusCheckerTask = taskFactory.getEsbStatusCheckerTaskInstance();
+          jvmTaskRunner.start();
+          networkMonitor.start();
+          dbTaskRunner.start();
+          dbCleanerTask.start();
+          esbStatusCheckerTask.start();
+          new PingHandler().start();
 
     }
 }

@@ -20,10 +20,9 @@
 package org.wso2.esbMonitor.network;
 
 import org.apache.log4j.Logger;
-import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
-import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
-import org.wso2.esbMonitor.persistance.PersistenceService;
+import org.wso2.esbMonitor.esbEvents.events.EventFactory;
+import org.wso2.esbMonitor.esbEvents.events.HighRequestCountEvent;
 import org.wso2.esbMonitor.persistance.PersistenceServiceFactory;
 
 import javax.management.*;
@@ -43,22 +42,22 @@ public class PassThruHTTPSenderAndReciever {
     // needs to be initialized by a property file
     private int maxThreadCount;
     private int maxQueueSize;
-    private ThreadDumpCreator threadDumpCreator = null;
+    private boolean eventDetected=false;
+    private HighRequestCountEvent event;
 
     public PassThruHTTPSenderAndReciever(String bean,RemoteConnector remote){
         this.bean = bean;
         this.remote=remote;
+        event= EventFactory.getHighRequestCountEventInstance();
     }
 
     public void getMbeanInfo() {
-        if(checkWarningUsage(bean)){
-            logger.info("generate report!");
-        }
+        checkWarningUsage(bean);
     }
 
     /**
      * */
-    private boolean checkWarningUsage(String mbeanName) {
+    private void checkWarningUsage(String mbeanName) {
         PassThruHTTPBean passThruHTTPBean = new PassThruHTTPBean();
 
         try {
@@ -91,15 +90,20 @@ public class PassThruHTTPSenderAndReciever {
 
             logger.info(passThruHTTPBean.getMessageSent() +" "+ passThruHTTPBean.getActiveThreadCount());
 
-            if(passThruHTTPBean.getActiveThreadCount() > maxThreadCount || passThruHTTPBean.getQueueSize() > maxQueueSize) {
+            if((passThruHTTPBean.getActiveThreadCount() >= maxThreadCount) || (passThruHTTPBean.getQueueSize() >= maxQueueSize)) {
                 logger.info(":High HTTP loads");
-                if(!threadDumpCreator.isThreadDumpInProgress()){
-                    threadDumpCreator.getMbeanInfo();
+                if(!eventDetected){
+                    eventDetected=true;
+                    event.initEvent();
                 }
-                return true;
-
+                event.triggerEvent();
             } else {
                 logger.info("HTTP network load is normal");
+            }
+            if(event.isEventPeriodElapsed()&&eventDetected){
+                eventDetected=false;
+                event.resetEvent();
+                logger.info("High Request Count Event ended on " +System.currentTimeMillis());
             }
             logger.info("Adding network event to scheduledList");
             PersistenceServiceFactory factory = new PersistenceServiceFactory();
@@ -120,8 +124,6 @@ public class PassThruHTTPSenderAndReciever {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-
-        return false;
     }
 
     public void setMaxThreadCount(int maxThreadCount) {
@@ -132,7 +134,4 @@ public class PassThruHTTPSenderAndReciever {
         this.maxQueueSize = maxQueueSize;
     }
 
-    public void setThreadDumpCreator(ThreadDumpCreator threadDumpCreator) {
-        this.threadDumpCreator = threadDumpCreator;
-    }
 }

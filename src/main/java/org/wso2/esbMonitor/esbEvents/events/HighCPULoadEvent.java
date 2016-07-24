@@ -36,7 +36,7 @@ import java.util.List;
  * Created by Dinanjana on 23/07/2016.
  */
 public class HighCPULoadEvent extends Event{
-    private final Logger logger = Logger.getLogger(OOMEvent.class);
+    private final Logger logger = Logger.getLogger(HighCPULoadEvent.class);
     private ThreadDumpCreator threadDumpCreator;
     private HeapDumper heapDumper;
     private int maxNumOfThreadDumps;

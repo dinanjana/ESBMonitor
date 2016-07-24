@@ -59,16 +59,12 @@ public class NetworkMonitor extends Thread {
                 remoteConnector);
         passThruHTTPSender.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
         passThruHTTPSender.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
-        passThruHTTPSender.setThreadDumpCreator(threadDumpCreator);
         passThruHTTPReciever.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
         passThruHTTPReciever.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
-        passThruHTTPReciever.setThreadDumpCreator(threadDumpCreator);
         passThruHTTPSReciever.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
         passThruHTTPSReciever.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
-        passThruHTTPSReciever.setThreadDumpCreator(threadDumpCreator);
         passThruHTTPSSender.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
         passThruHTTPSSender.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
-        passThruHTTPSSender.setThreadDumpCreator(threadDumpCreator);
     }
     public void run(){
         initTask();

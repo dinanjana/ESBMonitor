@@ -153,6 +153,8 @@ public class Configuration {
         instance.eventConfigurations.put(ESBStatus.OOM_EVENT,eventConfiguration);
         eventConfiguration = new EventConfiguration(ESBStatus.HIGH_CPU_LOAD,"wso2esbfrHIGHCPULOADevent.properties");
         instance.eventConfigurations.put(ESBStatus.HIGH_CPU_LOAD,eventConfiguration);
+        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_CPU_LOAD,"wso2esbfrHighRequestCountevent.properties");
+        instance.eventConfigurations.put(ESBStatus.HIGH_REQUEST_COUNT,eventConfiguration);
     }
 
     public String getJmxurl() {

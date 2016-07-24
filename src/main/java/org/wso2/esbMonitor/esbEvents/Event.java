@@ -40,6 +40,8 @@ public abstract class Event extends Observable{
      * */
     public abstract void resetEvent();
 
+    public abstract String getValue();
+
     public boolean isEventPeriodElapsed(){
         return eventEndtime <= System.currentTimeMillis();
     }

@@ -75,7 +75,7 @@ public class MemoryMonitor extends JVMDetails{
                 } else {
                     logger.info("Memory usage is normal " + (double) usedMemory / maxMemory);
                 }
-                //Event ends System.currentTimeMillis() >= eventEndTime
+                //Event ends
                 if(oomEvent.isEventPeriodElapsed() && eventDetected){
                     eventDetected=false;
                     oomEvent.resetEvent();
