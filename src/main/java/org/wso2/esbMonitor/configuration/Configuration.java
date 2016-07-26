@@ -155,6 +155,8 @@ public class Configuration {
         instance.eventConfigurations.put(ESBStatus.HIGH_CPU_LOAD,eventConfiguration);
         eventConfiguration = new EventConfiguration(ESBStatus.HIGH_CPU_LOAD,"wso2esbfrHighRequestCountevent.properties");
         instance.eventConfigurations.put(ESBStatus.HIGH_REQUEST_COUNT,eventConfiguration);
+        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_CPU_LOAD,"wso2esbfrUnresponsiveESBevent.properties");
+        instance.eventConfigurations.put(ESBStatus.UNRESPONSIVE_ESB,eventConfiguration);
     }
 
     public String getJmxurl() {

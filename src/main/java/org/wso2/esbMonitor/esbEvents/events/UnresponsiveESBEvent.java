@@ -19,29 +19,101 @@
 
 package org.wso2.esbMonitor.esbEvents.events;
 
+import org.apache.log4j.Logger;
+import org.wso2.esbMonitor.configuration.Configuration;
+import org.wso2.esbMonitor.configuration.EventConfiguration;
+import org.wso2.esbMonitor.connector.ConnectorFactory;
+import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
+import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
+import org.wso2.esbMonitor.esbEvents.ESBStatus;
 import org.wso2.esbMonitor.esbEvents.Event;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Dinanjana on 23/07/2016.
  */
 public class UnresponsiveESBEvent extends Event {
+    private final Logger logger = Logger.getLogger(HighCPULoadEvent.class);
+    private ThreadDumpCreator threadDumpCreator;
+    private HeapDumper heapDumper;
+    private int maxNumOfThreadDumps;
+    private int maxNumOfHeapDumps;
+    private long threadDumpsCreated;
+    private long heapDumpsCreated;
+    private List<String> threadDumpsNames = new ArrayList<>();
+    private List<String> heapDumpsNames = new ArrayList<>();
+    private long eventPeriod;
+    private long eventStartTime;
+
+    protected UnresponsiveESBEvent(){
+        EventConfiguration eventConfiguration= Configuration.getInstance().getEventConfigurations().
+                get(ESBStatus.UNRESPONSIVE_ESB);
+        this.threadDumpCreator= new ThreadDumpCreator(
+                Configuration.getInstance(),
+                new ConnectorFactory().getRemoteConnectorInstance());
+        this.maxNumOfHeapDumps=eventConfiguration.getMaxHeapDumps();
+        this.maxNumOfThreadDumps=eventConfiguration.getMaxThreadDumps();
+        this.eventPeriod=eventConfiguration.getEventPeriod();
+    }
     @Override
     public void initEvent() {
-
+        eventStartTime=System.currentTimeMillis();
+        setEventEndTime(eventPeriod + System.currentTimeMillis());
+        logger.info("New Unresponsive ESB event started.Ends on "+getEventEndTime()+
+                    " Maximum of "+maxNumOfThreadDumps + " and maximum of "+maxNumOfHeapDumps
+                    +" will be created.");
     }
 
     @Override
     public void triggerEvent() {
-
+        //Checks if event has elapsed and if the number of dumps
+        //allowed elapsed
+        if(!isEventPeriodElapsed()){
+            if(threadDumpsCreated <= maxNumOfThreadDumps){
+                threadDumpCreator.getMbeanInfo();
+                threadDumpsNames.add(threadDumpCreator.getThreadDumpName());
+                threadDumpsCreated++;
+                logger.info("Thread dump created for unresponsive esb");
+            }
+            if(heapDumpsCreated <= maxNumOfHeapDumps){
+                heapDumper = new HeapDumper(Configuration.getInstance(),new ConnectorFactory().getRemoteConnectorInstance());
+                heapDumpsNames.add(heapDumper.getHeapDumpName());
+                heapDumper.start();
+                heapDumpsCreated++;
+                logger.info("Heap dump created for unresponsive esb");
+            }
+        }
     }
 
     @Override
     public void resetEvent() {
-
+        setChanged();
+        notifyObservers();
+        threadDumpsCreated=0;
+        heapDumpsCreated=0;
+        threadDumpsNames.clear();
+        heapDumpsNames.clear();
     }
 
     @Override
     public String getValue() {
-        return null;
+        StringBuffer heapNames=new StringBuffer();
+        StringBuffer threadNames=new StringBuffer();
+        for(String name:heapDumpsNames){
+            heapNames.append(name + " ,");
+        }
+        for (String name:threadDumpsNames){
+            threadNames.append(name+ " ,");
+        }
+        Configuration config = Configuration.getInstance();
+        Date date = new Date(eventStartTime);
+        String ret = "\nPossible Unresponsive ESB Event detected at "+ date+" \n"+heapDumpsCreated + " Heap dumps created.Names of them are "+
+                     heapNames.toString()+" Available at :"+ config.getConfigurationBean().getHeapDumpPath()
+                     +"\n"+ threadDumpsCreated + " Thread dumps created. Names of them are "+threadNames.toString() +". Available at :"
+                     +config.getConfigurationBean().getThreadDumpPath();
+        return ret;
     }
 }

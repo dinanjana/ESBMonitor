@@ -25,12 +25,14 @@ package org.wso2.esbMonitor.dumpHandlers;
  */
 
 import com.sun.management.HotSpotDiagnosticMXBean;
+import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 
 import javax.management.JMX;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -45,10 +47,11 @@ import java.util.Date;
  * */
 public class HeapDumper extends Thread {
 
+    private final Logger logger=Logger.getLogger(HeapDumper.class);
     private final String HOTSPOT_BEAN_NAME =
             "com.sun.management:type=HotSpotDiagnostic";
     private volatile HotSpotDiagnosticMXBean hotspotMBean;
-    private final Object heapDumpInProgress = new Object();
+    private static boolean heapDumpInProgress = false;
     private String fileName = "heap//";
     private RemoteConnector remoteConnector;
     private Configuration config;
@@ -61,16 +64,25 @@ public class HeapDumper extends Thread {
     }
 
     private void dumpHeap(String fileName, boolean live) {
-         synchronized (heapDumpInProgress){
-            initHotspotMBean();
-            try {
-                hotspotMBean.dumpHeap(fileName, live);
-            } catch (RuntimeException re) {
-                throw re;
-            } catch (Exception exp) {
-                throw new RuntimeException(exp);
-            }
-        }
+         if(!heapDumpInProgress) {
+             heapDumpInProgress=true;
+             initHotspotMBean();
+             try {
+                 hotspotMBean.dumpHeap(fileName, live);
+             } catch (RuntimeException re) {
+                 throw re;
+             }catch (IOException exp){
+                 if(exp.getMessage()=="java.io.IOException: File exists"){
+                     logger.info("Heap dump is already created");
+                 }
+             }
+             catch (Exception exp) {
+                 logger.error("Error:",exp);
+             }
+             finally {
+                 heapDumpInProgress=false;
+             }
+         }
 
     }
 

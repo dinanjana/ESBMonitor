@@ -25,7 +25,8 @@ package org.wso2.esbMonitor.esbEvents;
 public enum ESBStatus {
     OOM_EVENT(0),
     HIGH_CPU_LOAD(1),
-    HIGH_REQUEST_COUNT(3);
+    HIGH_REQUEST_COUNT(2),
+    UNRESPONSIVE_ESB(3);
     private int id;
 
     private ESBStatus(int id){

@@ -22,6 +22,7 @@ package org.wso2.esbMonitor.configuration;
 import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.esbEvents.ESBStatus;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -91,4 +92,6 @@ public class EventConfiguration {
     public long getEventPeriod() {
         return eventPeriod;
     }
+
+    public Properties getOtherProperties(){return this.properties; }
 }

@@ -74,6 +74,11 @@ public class ReportCreator implements Observer {
             byte[] data = ((HighRequestCountEvent) o).getValue().getBytes(Charset.forName("UTF-8"));
             FileWriter.writeFile("Report.txt",data);
         }
+        if(o==unresponsiveESBEvent && o instanceof UnresponsiveESBEvent){
+            logger.info("Notified observer");
+            byte[] data = ((UnresponsiveESBEvent) o).getValue().getBytes(Charset.forName("UTF-8"));
+            FileWriter.writeFile("Report.txt",data);
+        }
     }
 
     public void setOomEvent(OOMEvent oomEvent){

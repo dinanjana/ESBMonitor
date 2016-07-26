@@ -28,6 +28,7 @@ import org.wso2.esbMonitor.esbEvents.events.EventFactory;
 import org.wso2.esbMonitor.esbEvents.events.HighCPULoadEvent;
 import org.wso2.esbMonitor.esbEvents.events.HighRequestCountEvent;
 import org.wso2.esbMonitor.esbEvents.events.OOMEvent;
+import org.wso2.esbMonitor.esbEvents.events.UnresponsiveESBEvent;
 import org.wso2.esbMonitor.persistance.PersistenceService;
 import org.wso2.esbMonitor.persistance.PersistenceServiceFactory;
 import org.wso2.esbMonitor.pingReceiver.PingHandler;
@@ -67,6 +68,7 @@ public class ESBMonitor {
           OOMEvent oomEvent = EventFactory.getOomEventInstance();
           HighCPULoadEvent highCPULoadEvent=EventFactory.getHighCPULoadEventInstance();
           HighRequestCountEvent highRequestCountEvent=EventFactory.getHighRequestCountEventInstance();
+          UnresponsiveESBEvent unresponsiveESBEvent=EventFactory.getUnresponsiveEsbEventInstance();
 
           reportCreator.setOomEvent(oomEvent);
           reportCreator.setHighCPULoadEvent(highCPULoadEvent);
@@ -75,6 +77,7 @@ public class ESBMonitor {
           oomEvent.addObserver(reportCreator);
           highCPULoadEvent.addObserver(reportCreator);
           highRequestCountEvent.addObserver(reportCreator);
+          unresponsiveESBEvent.addObserver(reportCreator);
 
         /**
          * Tasks start here

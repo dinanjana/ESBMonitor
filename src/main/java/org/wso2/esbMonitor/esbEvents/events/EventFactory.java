@@ -26,6 +26,7 @@ public class EventFactory {
     private static OOMEvent oomEvent=null;
     private static HighCPULoadEvent highCPULoadEvent=null;
     private static HighRequestCountEvent highRequestCountEvent=null;
+    private static UnresponsiveESBEvent unresponsiveESBEvent=null;
 
     public static OOMEvent getOomEventInstance() {
         if(oomEvent == null){
@@ -46,5 +47,12 @@ public class EventFactory {
             highRequestCountEvent=new HighRequestCountEvent();
         }
         return highRequestCountEvent;
+    }
+
+    public static UnresponsiveESBEvent getUnresponsiveEsbEventInstance(){
+        if(unresponsiveESBEvent==null){
+            unresponsiveESBEvent=new UnresponsiveESBEvent();
+        }
+        return unresponsiveESBEvent;
     }
 }

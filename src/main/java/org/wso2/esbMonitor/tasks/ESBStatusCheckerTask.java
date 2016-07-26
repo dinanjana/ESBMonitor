@@ -31,6 +31,7 @@ public class ESBStatusCheckerTask extends Thread{
     Logger logger = Logger.getLogger(ESBStatusCheckerTask.class);
     private long waitTime;
     private boolean status=true;
+    private PingHandler pingHandler=new PingHandler();
     private Configuration configuration;
 
     protected ESBStatusCheckerTask(){
@@ -41,18 +42,12 @@ public class ESBStatusCheckerTask extends Thread{
     }
 
     public void run(){
+        initTask();
         while (true){
-            long currentTime = System.currentTimeMillis();
-            long lastUpdatedTime = PingHandler.getLastUpdatedTime();
-            if(currentTime-lastUpdatedTime > waitTime){
-                logger.info("ESB is unresponsive..");
-                /**TODO
-                 * Notify
-                 */
-                status=false;
-            }else {
-                logger.info("ESB is responsive..");
-                status=true;
+            try {
+                pingHandler.sendPing();
+            } catch (Exception e) {
+                logger.error("Error :",e);
             }
             try {
                 Thread.sleep(waitTime +1000L);
