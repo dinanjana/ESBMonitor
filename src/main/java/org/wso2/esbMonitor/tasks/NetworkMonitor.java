@@ -24,6 +24,7 @@ import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.connector.ConnectorFactory;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
+import org.wso2.esbMonitor.network.NetworkFactory;
 import org.wso2.esbMonitor.network.PassThruHTTPSenderAndReciever;
 
 /**
@@ -47,16 +48,21 @@ public class NetworkMonitor extends Thread {
         remoteConnector = connectorFactory.getRemoteConnectorInstance();
     }
     private void initTask(){
+        NetworkFactory nf = new NetworkFactory(remoteConnector);
         waitTime=config.getConfigurationBean().getNetworkTask();
         threadDumpCreator = new ThreadDumpCreator(config,remoteConnector);
-        passThruHTTPSender = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-http-sender",
-                remoteConnector);
-        passThruHTTPReciever = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-http-receiver",
-                remoteConnector);
-        passThruHTTPSSender = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-https-sender",
-                remoteConnector);
-        passThruHTTPSReciever = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-https-receiver",
-                remoteConnector);
+        passThruHTTPSSender=NetworkFactory.getPassThruHTTPSSenderInstance();
+        passThruHTTPSender=NetworkFactory.getPassThruHTTPSenderInstance();
+        passThruHTTPReciever=NetworkFactory.getPassThruHTTPRecieverInstance();
+        passThruHTTPSReciever=NetworkFactory.getPassThruHTTPSRecieverInstance();
+//        passThruHTTPSender = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-http-sender",
+//                remoteConnector);
+//        passThruHTTPReciever = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-http-receiver",
+//                remoteConnector);
+//        passThruHTTPSSender = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-https-sender",
+//                remoteConnector);
+//        passThruHTTPSReciever = new PassThruHTTPSenderAndReciever("org.apache.synapse:Type=Transport,Name=passthru-https-receiver",
+//                remoteConnector);
         passThruHTTPSender.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
         passThruHTTPSender.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
         passThruHTTPReciever.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());

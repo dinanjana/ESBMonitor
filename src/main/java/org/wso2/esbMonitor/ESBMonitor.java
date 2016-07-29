@@ -73,6 +73,7 @@ public class ESBMonitor {
           reportCreator.setOomEvent(oomEvent);
           reportCreator.setHighCPULoadEvent(highCPULoadEvent);
           reportCreator.setHighRequestCountEvent(highRequestCountEvent);
+          reportCreator.setUnresponsiveESBEvent(unresponsiveESBEvent);
 
           oomEvent.addObserver(reportCreator);
           highCPULoadEvent.addObserver(reportCreator);

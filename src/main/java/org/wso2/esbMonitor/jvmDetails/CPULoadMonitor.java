@@ -20,20 +20,12 @@
 package org.wso2.esbMonitor.jvmDetails;
 
 import org.apache.log4j.Logger;
-import org.wso2.esbMonitor.configuration.Configuration;
-import org.wso2.esbMonitor.configuration.EventConfiguration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
-import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
-import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
-import org.wso2.esbMonitor.esbEvents.ESBStatus;
 import org.wso2.esbMonitor.esbEvents.events.EventFactory;
 import org.wso2.esbMonitor.esbEvents.events.HighCPULoadEvent;
 
 import javax.management.*;
 import java.lang.management.OperatingSystemMXBean;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Dinanjana on 30/05/2016.
@@ -46,20 +38,11 @@ public class CPULoadMonitor extends JVMDetails {
     private final String OBJECT_NAME="java.lang:type=OperatingSystem";
     //needs to be initialized from a property file
     private double cpuLoad;
-    private Configuration config;
-    private ThreadDumpCreator threadDumpCreator=null;
-    private HeapDumper heapDumper=null;
-    private int maxNumOfThreadDumps;
-    private int maxNumOfHeapDumps;
-    private long threadDumpsCreated;
-    private long heapDumpsCreated;
-    private List<String> threadDumpsNames = new ArrayList<>();
-    private List<String> heapDumpsNames = new ArrayList<>();
-    private long eventPeriod;
-    private long eventStartTime;
-    private long eventEndTime;
     private boolean eventDetected=false;
     private HighCPULoadEvent highCPULoadEvent;
+    private static double currentCPULoad;
+
+    protected CPULoadMonitor(){}
 
     @Override
     public void getMbeanInfo() {
@@ -74,10 +57,6 @@ public class CPULoadMonitor extends JVMDetails {
 
     @Override
     public void initMonitor(){
-//        EventConfiguration eventConfiguration = config.getEventConfigurations().get(ESBStatus.OOM_EVENT);
-//        maxNumOfHeapDumps=eventConfiguration.getMaxHeapDumps();
-//        maxNumOfThreadDumps=eventConfiguration.getMaxThreadDumps();
-//        eventPeriod =eventConfiguration.getEventPeriod();
         highCPULoadEvent= EventFactory.getHighCPULoadEventInstance();
     }
 
@@ -85,53 +64,23 @@ public class CPULoadMonitor extends JVMDetails {
     private void checkWarningUsage(ObjectName mbean) {
         OperatingSystemMXBean operatingSystemMXBean=
                 JMX.newMBeanProxy(remote.getRemote(), mbean, OperatingSystemMXBean.class);
+        //If the load average is not available, a negative value is returned.
         double cpuLoad = operatingSystemMXBean.getSystemLoadAverage();
-
+        currentCPULoad=cpuLoad;
         if (cpuLoad < this.cpuLoad) {
             logger.info(":High CPU load");
             if(!eventDetected){
                 highCPULoadEvent.initEvent();
                 eventDetected=true;
-//                eventStartTime=System.currentTimeMillis();
-//                eventEndTime= eventPeriod + System.currentTimeMillis();
-//                eventDetected=true;
-//                //ToDo Send to report module
-//                logger.info("New HIGH CPU LOAD event started.Ends on "+eventEndTime+
-//                        " Maximum of "+maxNumOfThreadDumps + " and maximum of "+maxNumOfHeapDumps
-//                        +" will be created.");
             }
-//            if(threadDumpCreator == null){
-//                threadDumpCreator = new ThreadDumpCreator(config,remote);
-//            }
-//            if(System.currentTimeMillis() < eventEndTime){
-//                if(threadDumpsCreated <= maxNumOfThreadDumps){
-//                    threadDumpCreator.getMbeanInfo();
-//                    threadDumpsNames.add(threadDumpCreator.getThreadDumpName());
-//                    threadDumpsCreated++;
-//                    logger.info("Thread dump created");
-//                }
-//                if(heapDumpsCreated <= maxNumOfHeapDumps){
-//                    heapDumper = new HeapDumper(config,remote);
-//                    heapDumpsNames.add(heapDumper.getHeapDumpName());
-//                    heapDumper.start();
-//                    heapDumpsCreated++;
-//                    logger.info("Heap dump created");
-//                }
-//            }
             highCPULoadEvent.triggerEvent();
         } else {
             logger.info("cpu load is normal: " + cpuLoad);
         }
         //Event ends
         if(highCPULoadEvent.isEventPeriodElapsed() && eventDetected){
-//            setChanged();
-//            notifyObservers();
             eventDetected=false;
             highCPULoadEvent.resetEvent();
-//            threadDumpsCreated=0;
-//            heapDumpsCreated=0;
-//            threadDumpsNames.clear();
-//            heapDumpsNames.clear();
             logger.info("High CPU Load Event ended on " +System.currentTimeMillis());
         }
 
@@ -139,21 +88,11 @@ public class CPULoadMonitor extends JVMDetails {
 
     @Override
     public synchronized String  getValue(){
-//        StringBuffer heapNames=new StringBuffer();
-//        StringBuffer threadNames=new StringBuffer();
-//        for(String name:heapDumpsNames){
-//            heapNames.append(name + " ,");
-//        }
-//        for (String name:threadDumpsNames){
-//            threadNames.append(name+ " ,");
-//        }
-//        Date date = new Date(eventStartTime);
-//        String ret = "\nHIGH CPU LOAD Event detected at "+ date+" \n"+heapDumpsCreated +
-//                " Heap dumps created.Names of them are "+heapNames.toString()+" Available at :"+
-//                config.getConfigurationBean().getHeapDumpPath()
-//                +"\n"+ threadDumpsCreated + " Thread dumps created. Names of them are "+threadNames.toString() +". Available at :"
-//                +config.getConfigurationBean().getThreadDumpPath();
         return highCPULoadEvent.getValue();
+    }
+
+    public synchronized static double getCurrentCPULoad(){
+        return currentCPULoad;
     }
 
     public void setCpuLoad(double cpuLoad) {
@@ -164,7 +103,4 @@ public class CPULoadMonitor extends JVMDetails {
         this.remote = remote;
     }
 
-    public void setConfig(Configuration config) {
-        this.config = config;
-    }
 }

@@ -151,11 +151,11 @@ public class Configuration {
         }
         EventConfiguration eventConfiguration = new EventConfiguration(ESBStatus.OOM_EVENT,"wso2esbfrOOMevent.properties");
         instance.eventConfigurations.put(ESBStatus.OOM_EVENT,eventConfiguration);
-        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_CPU_LOAD,"wso2esbfrHIGHCPULOADevent.properties");
+        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_CPU_LOAD,"wso2esbfrHIGHCPULoadEvent.properties");
         instance.eventConfigurations.put(ESBStatus.HIGH_CPU_LOAD,eventConfiguration);
-        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_CPU_LOAD,"wso2esbfrHighRequestCountevent.properties");
+        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_REQUEST_COUNT,"wso2esbfrHighRequestCountEvent.properties");
         instance.eventConfigurations.put(ESBStatus.HIGH_REQUEST_COUNT,eventConfiguration);
-        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_CPU_LOAD,"wso2esbfrUnresponsiveESBevent.properties");
+        eventConfiguration = new EventConfiguration(ESBStatus.UNRESPONSIVE_ESB,"wso2esbfrUnresponsiveESBEvent.properties");
         instance.eventConfigurations.put(ESBStatus.UNRESPONSIVE_ESB,eventConfiguration);
     }
 

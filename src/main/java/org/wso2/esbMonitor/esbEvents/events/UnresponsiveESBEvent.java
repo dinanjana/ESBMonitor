@@ -27,6 +27,9 @@ import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
 import org.wso2.esbMonitor.esbEvents.ESBStatus;
 import org.wso2.esbMonitor.esbEvents.Event;
+import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
+import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
+import org.wso2.esbMonitor.network.NetworkFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,9 +50,12 @@ public class UnresponsiveESBEvent extends Event {
     private List<String> heapDumpsNames = new ArrayList<>();
     private long eventPeriod;
     private long eventStartTime;
+    private EventConfiguration eventConfiguration;
+    private  boolean createThreadDumps;
+    private boolean createHeapDumps;
 
     protected UnresponsiveESBEvent(){
-        EventConfiguration eventConfiguration= Configuration.getInstance().getEventConfigurations().
+        eventConfiguration= Configuration.getInstance().getEventConfigurations().
                 get(ESBStatus.UNRESPONSIVE_ESB);
         this.threadDumpCreator= new ThreadDumpCreator(
                 Configuration.getInstance(),
@@ -57,14 +63,16 @@ public class UnresponsiveESBEvent extends Event {
         this.maxNumOfHeapDumps=eventConfiguration.getMaxHeapDumps();
         this.maxNumOfThreadDumps=eventConfiguration.getMaxThreadDumps();
         this.eventPeriod=eventConfiguration.getEventPeriod();
+        createHeapDumps=eventConfiguration.isCreateHeapDumps();
+        createThreadDumps=eventConfiguration.isCreateThreadDumps();
     }
     @Override
     public void initEvent() {
         eventStartTime=System.currentTimeMillis();
         setEventEndTime(eventPeriod + System.currentTimeMillis());
         logger.info("New Unresponsive ESB event started.Ends on "+getEventEndTime()+
-                    " Maximum of "+maxNumOfThreadDumps + " and maximum of "+maxNumOfHeapDumps
-                    +" will be created.");
+                    " Maximum of "+maxNumOfThreadDumps + " thread dumps and maximum of "+maxNumOfHeapDumps
+                    +"heap dumps will be created.");
     }
 
     @Override
@@ -72,13 +80,13 @@ public class UnresponsiveESBEvent extends Event {
         //Checks if event has elapsed and if the number of dumps
         //allowed elapsed
         if(!isEventPeriodElapsed()){
-            if(threadDumpsCreated <= maxNumOfThreadDumps){
+            if(threadDumpsCreated <= maxNumOfThreadDumps && createThreadDumps){
                 threadDumpCreator.getMbeanInfo();
                 threadDumpsNames.add(threadDumpCreator.getThreadDumpName());
                 threadDumpsCreated++;
                 logger.info("Thread dump created for unresponsive esb");
             }
-            if(heapDumpsCreated <= maxNumOfHeapDumps){
+            if(heapDumpsCreated <= maxNumOfHeapDumps && createHeapDumps){
                 heapDumper = new HeapDumper(Configuration.getInstance(),new ConnectorFactory().getRemoteConnectorInstance());
                 heapDumpsNames.add(heapDumper.getHeapDumpName());
                 heapDumper.start();
@@ -102,18 +110,33 @@ public class UnresponsiveESBEvent extends Event {
     public String getValue() {
         StringBuffer heapNames=new StringBuffer();
         StringBuffer threadNames=new StringBuffer();
+        String healthDet="";
         for(String name:heapDumpsNames){
             heapNames.append(name + " ,");
         }
         for (String name:threadDumpsNames){
             threadNames.append(name+ " ,");
         }
+        if(eventConfiguration.isUsedMemory()){
+            healthDet= "\nUsed heap memory :"+ MemoryMonitor.getCurrentUsedMemory()/(1024*1024) +" mb";
+        }
+        if(eventConfiguration.isCPULoad()){
+            healthDet=healthDet+"\nCPU load :"+ CPULoadMonitor.getCurrentCPULoad();
+        }
+        if(eventConfiguration.isNetworkLoad()){
+            healthDet=healthDet+"\n HTTP receiver active thread count :" + NetworkFactory.
+                    getPassThruHTTPRecieverInstance().getCurrThreadCount();
+            healthDet=healthDet+"\n HTTPS receiver active thread count :" + NetworkFactory.
+                    getPassThruHTTPSRecieverInstance().getCurrThreadCount();
+        }
         Configuration config = Configuration.getInstance();
         Date date = new Date(eventStartTime);
-        String ret = "\nPossible Unresponsive ESB Event detected at "+ date+" \n"+heapDumpsCreated + " Heap dumps created.Names of them are "+
+        String ret = "\n\nPossible Unresponsive ESB Event detected at "+ date+" \n"+heapDumpsCreated + " Heap dumps created.Names of them are "+
                      heapNames.toString()+" Available at :"+ config.getConfigurationBean().getHeapDumpPath()
                      +"\n"+ threadDumpsCreated + " Thread dumps created. Names of them are "+threadNames.toString() +". Available at :"
-                     +config.getConfigurationBean().getThreadDumpPath();
+                     +config.getConfigurationBean().getThreadDumpPath()+ "\nOther parameters collected at the moment of " +
+                                                                          "incident are : "+healthDet;
+
         return ret;
     }
 }

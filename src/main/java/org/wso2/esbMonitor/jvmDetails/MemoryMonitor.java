@@ -49,6 +49,9 @@ public class MemoryMonitor extends JVMDetails{
     private Configuration config;
     private boolean eventDetected=false;
     private OOMEvent oomEvent;
+    private static long currentUsedMemory=0;
+
+    protected MemoryMonitor(){}
 
     public void initMonitor(){
         oomEvent= EventFactory.getOomEventInstance();
@@ -64,6 +67,7 @@ public class MemoryMonitor extends JVMDetails{
                 CompositeData memoryUsage = (CompositeData) remote.getMbeanAttribute(OBJECT_NAME,"HeapMemoryUsage");
                 long maxMemory = (Long) memoryUsage.get("max");
                 long usedMemory = (Long) memoryUsage.get("used");
+                currentUsedMemory=maxMemory;
                 if ((double) usedMemory / maxMemory > memory) {
                     logger.info(":Possible Out of Memory event detected");
                     //Records the new event
@@ -93,6 +97,10 @@ public class MemoryMonitor extends JVMDetails{
             } catch (IOException e) {
                 logger.error(e.getMessage());
             }
+    }
+
+    public synchronized static long getCurrentUsedMemory(){
+        return currentUsedMemory;
     }
 
     public synchronized String  getValue(){

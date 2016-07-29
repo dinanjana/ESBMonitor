@@ -36,6 +36,11 @@ public class EventConfiguration {
     private int maxThreadDumps=4;
     private int maxHeapDumps=4;
     private long eventPeriod=3000L;
+    private boolean createHeapDumps=false;
+    private boolean createThreadDumps=false;
+    private boolean isUsedMemory=false;
+    private boolean isCPULoad=false;
+    private boolean isNetworkLoad=false;
     private Properties properties;
 
     public EventConfiguration(ESBStatus eventName,String eventConfigFileName){
@@ -75,8 +80,28 @@ public class EventConfiguration {
             logger.info("Added max Thread dumps ="+ getMaxThreadDumps()+" for "+eventName);
         }
         if(prop.getProperty("EVENT_PERIOD") != null){
-            maxThreadDumps = Integer.parseInt(prop.getProperty("EVENT_PERIOD"));
-            logger.info("Added max event period  ="+ getMaxThreadDumps()+" for "+eventName);
+            eventPeriod = Integer.parseInt(prop.getProperty("EVENT_PERIOD"));
+            logger.info("Added max event period  ="+ getEventPeriod()+" for "+eventName);
+        }
+        if(prop.getProperty("CREATE_HEAP_DUMPS") != null){
+            createHeapDumps = Boolean.parseBoolean(prop.getProperty("CREATE_HEAP_DUMPS"));
+            logger.info("Added heap dumps required for "+eventName+" "+isCreateHeapDumps());
+        }
+        if(prop.getProperty("CREATE_THREAD_DUMPS") != null){
+            createThreadDumps = Boolean.parseBoolean(prop.getProperty("CREATE_THREAD_DUMPS"));
+            logger.info("Added thread dumps required for "+eventName+" "+isCreateThreadDumps());
+        }
+        if(prop.getProperty("IS_USED_MEMORY") != null){
+            isUsedMemory = Boolean.parseBoolean(prop.getProperty("IS_USED_MEMORY"));
+            logger.info("Added memory usage required for "+eventName+" "+isUsedMemory());
+        }
+        if(prop.getProperty("IS_CPU_LOAD") != null){
+            isCPULoad = Boolean.parseBoolean(prop.getProperty("IS_CPU_LOAD"));
+            logger.info("Added is cpu load required for "+eventName+" " +isCPULoad());
+        }
+        if(prop.getProperty("IS_NETWORK_LOAD") != null){
+            isNetworkLoad = Boolean.parseBoolean(prop.getProperty("IS_NETWORK_LOAD"));
+            logger.info("Added is network load required for "+eventName+" " +isNetworkLoad());
         }
 
     }
@@ -91,6 +116,26 @@ public class EventConfiguration {
 
     public long getEventPeriod() {
         return eventPeriod;
+    }
+
+    public boolean isCPULoad() {
+        return isCPULoad;
+    }
+
+    public boolean isUsedMemory() {
+        return isUsedMemory;
+    }
+
+    public boolean isCreateThreadDumps() {
+        return createThreadDumps;
+    }
+
+    public boolean isCreateHeapDumps() {
+        return createHeapDumps;
+    }
+
+    public boolean isNetworkLoad() {
+        return isNetworkLoad;
     }
 
     public Properties getOtherProperties(){return this.properties; }

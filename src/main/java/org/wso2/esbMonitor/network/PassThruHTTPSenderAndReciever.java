@@ -44,6 +44,8 @@ public class PassThruHTTPSenderAndReciever {
     private int maxQueueSize;
     private boolean eventDetected=false;
     private HighRequestCountEvent event;
+    private int currThreadCount;
+    private int currQueueSize;
 
     public PassThruHTTPSenderAndReciever(String bean,RemoteConnector remote){
         this.bean = bean;
@@ -89,7 +91,8 @@ public class PassThruHTTPSenderAndReciever {
             }
 
             logger.info(passThruHTTPBean.getMessageSent() +" "+ passThruHTTPBean.getActiveThreadCount());
-
+            currThreadCount=passThruHTTPBean.getActiveThreadCount();
+            currQueueSize=passThruHTTPBean.getQueueSize();
             if((passThruHTTPBean.getActiveThreadCount() >= maxThreadCount) || (passThruHTTPBean.getQueueSize() >= maxQueueSize)) {
                 logger.info(":High HTTP loads");
                 if(!eventDetected){
@@ -134,4 +137,11 @@ public class PassThruHTTPSenderAndReciever {
         this.maxQueueSize = maxQueueSize;
     }
 
+    public int getCurrQueueSize() {
+        return this.currQueueSize;
+    }
+
+    public int getCurrThreadCount() {
+        return this.currThreadCount;
+    }
 }

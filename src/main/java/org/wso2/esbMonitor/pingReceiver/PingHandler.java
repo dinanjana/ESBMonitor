@@ -19,27 +19,19 @@
 
 package org.wso2.esbMonitor.pingReceiver;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
+
 import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.configuration.EventConfiguration;
 import org.wso2.esbMonitor.esbEvents.ESBStatus;
 import org.wso2.esbMonitor.esbEvents.events.EventFactory;
-import org.wso2.esbMonitor.esbEvents.events.HighRequestCountEvent;
 import org.wso2.esbMonitor.esbEvents.events.UnresponsiveESBEvent;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.nio.charset.Charset;
 
 /**
  * Created by Dinanjana on 19/06/2016.
@@ -59,52 +51,15 @@ public class PingHandler extends Thread{
     public PingHandler(){
         event= EventFactory.getUnresponsiveEsbEventInstance();
         EventConfiguration event=Configuration.getInstance().getEventConfigurations().get(ESBStatus.UNRESPONSIVE_ESB);
-//        ip=event.getOtherProperties().getProperty("IP");
-//        port=event.getOtherProperties().getProperty("PORT");
-//        maximumFailedRequestCount=Integer.parseInt(event.getOtherProperties().
-//                getProperty("MAXIMUM_FAILED_REQUEST_COUNT"));
-
+        ip=event.getOtherProperties().getProperty("IP");
+        port=event.getOtherProperties().getProperty("PORT");
+        maximumFailedRequestCount=Integer.parseInt(event.getOtherProperties().
+                getProperty("MAXIMUM_FAILED_REQUEST_COUNT"));
     }
-//    private static void initPingReceiver() throws IOException {
-//        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-//        server.createContext("/ping", new MyHandler());
-//        server.setExecutor(null); // creates a default executor
-//        server.start();
-//        logger.info("Ping server started");
-//    }
-//
-//    static class MyHandler implements HttpHandler {
-//        @Override
-//        public void handle(HttpExchange t) throws IOException {
-//            lastUpdatedTime = System.currentTimeMillis();
-//            String response = "Ping received";
-//            t.sendResponseHeaders(200, response.length());
-//            OutputStream os = t.getResponseBody();
-//            os.write(response.getBytes(Charset.forName("UTF-8")));
-//            os.close();
-//        }
-//
-//    }
-//
-//    public void run(){
-//        try {
-//            initPingReceiver();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public static void setPort(int port) {
-//        PingHandler.port = port;
-//    }
-//
-//    public static long getLastUpdatedTime(){
-//        return lastUpdatedTime;
-//    }
 
     public void sendPing(){
         String url = "http://"+ip+":"+port+"/esbFR/pingReq";
-        URL obj = null;
+        URL obj;
         try {
             obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -149,6 +104,10 @@ public class PingHandler extends Thread{
                     event.initEvent();
                 }
                 event.triggerEvent();
+                failedRequest=false;
+                continousFailedRequestCount=0;
+                eventDetected=false;
+                event.resetEvent();
             }
         }
 
