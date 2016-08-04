@@ -46,6 +46,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+ThreadDumps
+wso2FlightRecorder
+target
+lib
 # intellij files
 *.class
 .classpath

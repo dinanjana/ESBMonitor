@@ -39,7 +39,7 @@ import java.util.List;
  * Created by Dinanjana on 23/07/2016.
  */
 public class HighRequestCountEvent extends Event {
-    private final Logger logger = Logger.getLogger(HighCPULoadEvent.class);
+    private final Logger logger = Logger.getLogger(HighRequestCountEvent.class);
     private ThreadDumpCreator threadDumpCreator;
     private HeapDumper heapDumper;
     private int maxNumOfThreadDumps;

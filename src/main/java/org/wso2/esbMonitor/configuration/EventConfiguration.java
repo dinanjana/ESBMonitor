@@ -21,6 +21,8 @@ package org.wso2.esbMonitor.configuration;
 
 import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.esbEvents.ESBStatus;
+
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Properties;
@@ -58,7 +60,7 @@ public class EventConfiguration {
         try {
             properties = new Properties();
             InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
-
+            //FileInputStream inputStream=new FileInputStream(fileName);
             if (inputStream != null) {
                 properties.load(inputStream);
             } else {
@@ -85,23 +87,23 @@ public class EventConfiguration {
         }
         if(prop.getProperty("CREATE_HEAP_DUMPS") != null){
             createHeapDumps = Boolean.parseBoolean(prop.getProperty("CREATE_HEAP_DUMPS"));
-            logger.info("Added heap dumps required for "+eventName+" "+isCreateHeapDumps());
+            logger.info("Added heap dumps required for "+eventName+"= "+isCreateHeapDumps());
         }
         if(prop.getProperty("CREATE_THREAD_DUMPS") != null){
             createThreadDumps = Boolean.parseBoolean(prop.getProperty("CREATE_THREAD_DUMPS"));
-            logger.info("Added thread dumps required for "+eventName+" "+isCreateThreadDumps());
+            logger.info("Added thread dumps required for "+eventName+"= "+isCreateThreadDumps());
         }
         if(prop.getProperty("IS_USED_MEMORY") != null){
             isUsedMemory = Boolean.parseBoolean(prop.getProperty("IS_USED_MEMORY"));
-            logger.info("Added memory usage required for "+eventName+" "+isUsedMemory());
+            logger.info("Added memory usage required for "+eventName+"= "+isUsedMemory());
         }
         if(prop.getProperty("IS_CPU_LOAD") != null){
             isCPULoad = Boolean.parseBoolean(prop.getProperty("IS_CPU_LOAD"));
-            logger.info("Added is cpu load required for "+eventName+" " +isCPULoad());
+            logger.info("Added is cpu load required for "+eventName+"= " +isCPULoad());
         }
         if(prop.getProperty("IS_NETWORK_LOAD") != null){
             isNetworkLoad = Boolean.parseBoolean(prop.getProperty("IS_NETWORK_LOAD"));
-            logger.info("Added is network load required for "+eventName+" " +isNetworkLoad());
+            logger.info("Added is network load required for "+eventName+"= " +isNetworkLoad());
         }
 
     }

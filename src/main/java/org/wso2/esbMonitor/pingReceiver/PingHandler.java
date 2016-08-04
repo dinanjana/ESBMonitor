@@ -27,26 +27,38 @@ import org.wso2.esbMonitor.esbEvents.ESBStatus;
 import org.wso2.esbMonitor.esbEvents.events.EventFactory;
 import org.wso2.esbMonitor.esbEvents.events.UnresponsiveESBEvent;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 
 /**
  * Created by Dinanjana on 19/06/2016.
  */
-public class PingHandler extends Thread{
+public class PingHandler{
     private Logger logger = Logger.getLogger(PingHandler.class);
     private long lastUpdatedTime=0;
     private int maximumFailedRequestCount=5;
     private int continousFailedRequestCount=0;
-    private final String USER_AGENT = "Mozilla/5.0";
-    private String ip="127.0.0.1";
-    private String port="8080";
+    protected final String USER_AGENT = "Mozilla/5.0";
+    protected String ip="127.0.0.1";
+    protected String port="8080";
     private boolean failedRequest=false;
     private boolean eventDetected=false;
     private UnresponsiveESBEvent event;
+    private HostnameVerifier allHostsValid;
 
     public PingHandler(){
         event= EventFactory.getUnresponsiveEsbEventInstance();
@@ -55,20 +67,61 @@ public class PingHandler extends Thread{
         port=event.getOtherProperties().getProperty("PORT");
         maximumFailedRequestCount=Integer.parseInt(event.getOtherProperties().
                 getProperty("MAXIMUM_FAILED_REQUEST_COUNT"));
+        // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }
+        };
+        // Install the all-trusting trust manager
+        SSLContext sc = null;
+        try {
+            sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("Error :" ,e);
+        } catch (KeyManagementException e) {
+            logger.error("Error :" ,e);
+        }
+        // Create all-trusting host name verifier
+        allHostsValid = new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+        Authenticator.setDefault(new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("admin", "admin".toCharArray());
+            }
+        });
     }
 
     public void sendPing(){
-        String url = "http://"+ip+":"+port+"/esbFR/pingReq";
+
+        String url = "https://"+ip+":"+port+"/services/PingManager";
         URL obj;
         try {
             obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", USER_AGENT);
             int responseCode = con.getResponseCode();
             logger.info("\nSending ping request request to URL : " + url);
             logger.info("Response Code : " + responseCode);
-            if(responseCode >= 500 && responseCode < 600){
+            logger.debug("Response :" + con.getResponseMessage());
+            if(responseCode>99 && responseCode < 300){
+                return;
+            }
+            else if(responseCode >= 400 && responseCode < 600){
                 if(!failedRequest){
                     failedRequest=true;
                     continousFailedRequestCount=0;
@@ -92,7 +145,7 @@ public class PingHandler extends Thread{
         } catch (ProtocolException e) {
             logger.error("Error :", e);
         } catch (IOException e) {
-            //logger.error("Error :", e);
+            logger.error("Error :", e);
             if(!failedRequest){
                 failedRequest=true;
                 continousFailedRequestCount=0;

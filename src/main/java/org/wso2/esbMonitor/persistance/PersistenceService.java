@@ -43,6 +43,36 @@ public class PersistenceService {
         logger.info("Adding event :{}"+ passThruHTTPBean.getActiveThreadCount() +"Size :{}" +scheduledList.size());
         scheduledList.add(passThruHTTPBean);
     }
+    public void createTables(){
+        Statement stmt=null;
+        try{
+            stmt= conn.createStatement();
+            stmt.execute("CREATE TABLE HTTP_LOG(\n" +
+                         "  activeThreadCount INTEGER,\n" +
+                         "  avgSizeRecieved DECIMAL(3,2),\n" +
+                         "  avgSizeSent DECIMAL(3,2),\n" +
+                         "  faultsRecieving INTEGER,\n" +
+                         "  faultsSending INTEGER,\n" +
+                         "  messagesRecieved INTEGER,\n" +
+                         "  messageSent INTEGER,\n" +
+                         "  queueSize INTEGER,\n" +
+                         "  time TIMESTAMP,\n" +
+                         "  requestType INTEGER\n" +
+                         ")");
+        }catch (SQLException e){
+            logger.info("Table already exist" , e);
+        }
+        catch (Exception e){
+            logger.error("Table already exist",e);
+        }
+        finally {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+                logger.error("Error :" , e);
+            }
+        }
+    }
 
     public synchronized void addEventToDB() throws SQLException {
         Statement stmt = conn.createStatement();

@@ -33,7 +33,7 @@ import java.sql.*;
 public class DBConnector {
 
     private final String protocol = "jdbc:derby:";
-    private String dbName = "wso2FlightRecorder";
+    private String dbName = "./wso2FlightRecorder";
     private Connection conn ;
     private Logger logger = Logger.getLogger(DBConnector.class);
 

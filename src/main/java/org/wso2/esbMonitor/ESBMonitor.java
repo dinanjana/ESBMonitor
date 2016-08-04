@@ -36,6 +36,7 @@ import org.wso2.esbMonitor.reporting.ReportCreator;
 import org.wso2.esbMonitor.tasks.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  *
@@ -58,8 +59,9 @@ public class ESBMonitor {
           dbConnector.initDBConnection();
           persistenceServiceFactory.getPersistenceServiceInstance().
                 setConn(dbConnector.getConn());
+          persistenceServiceFactory.getPersistenceServiceInstance().createTables();
 
-      /**
+          /**
        * Registering events for notifications
        * */
           //List of observers
@@ -99,7 +101,7 @@ public class ESBMonitor {
           dbTaskRunner.start();
           dbCleanerTask.start();
           esbStatusCheckerTask.start();
-          new PingHandler().start();
+          //new PingHandler().start();
 
     }
 }

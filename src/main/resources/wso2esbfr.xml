@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+  ~ /*
+  ~  * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  ~
+  -->
+
+<configuration>
+    <main>
+        <db_task_interval>3000</db_task_interval>
+        <JVM_TASK_INTERVAL>3000</JVM_TASK_INTERVAL>
+        <NETWORK_TASK_INTERVAL>3000</NETWORK_TASK_INTERVAL>
+        <HEAP_DUMP_PATH>/heap</HEAP_DUMP_PATH>
+        <EMAIL_ADDRESS>someone@somecompany.com</EMAIL_ADDRESS>
+        <MAX_MEMORY_USAGE>0.05</MAX_MEMORY_USAGE>
+        <MAX_CPU_USAGE>0.01</MAX_CPU_USAGE>
+        <MAX_REQUEST_QUEUE_SIZE>0</MAX_REQUEST_QUEUE_SIZE>
+        <MAX_HTTP_REQUESTS>0</MAX_HTTP_REQUESTS>
+        <DB_CLEANER_TASK>24</DB_CLEANER_TASK>
+        <THREAD_DUMP_PATH>ThreadDumps/</THREAD_DUMP_PATH>
+        <PING_RECEIVING_PORT>9090</PING_RECEIVING_PORT>
+        <PING_DELAY>3000</PING_DELAY>
+    </main>
+    <event name="OOMEvent" CREATE_HEAP_DUMPS="false" CREATE_THREAD_DUMPS="false" IS_USED_MEMORY="false"
+           IS_CPU_LOAD="false" IS_NETWORK_LOAD="false" >
+        <MAX_HEAP_DUMPS>3</MAX_HEAP_DUMPS>
+        <MAX_THREAD_DUMPS>6</MAX_THREAD_DUMPS>
+        <EVENT_PERIOD>4999</EVENT_PERIOD>
+    </event>
+    <event name="HighCPULoadEvent"  CREATE_HEAP_DUMPS="false" CREATE_THREAD_DUMPS="false" IS_USED_MEMORY="false"
+           IS_CPU_LOAD="false" IS_NETWORK_LOAD="false">
+        <MAX_HEAP_DUMPS>3</MAX_HEAP_DUMPS>
+        <MAX_THREAD_DUMPS>6</MAX_THREAD_DUMPS>
+        <EVENT_PERIOD>4999</EVENT_PERIOD>
+    </event>
+    <event name="HighRequestCountEvent"  CREATE_HEAP_DUMPS="false" CREATE_THREAD_DUMPS="false" IS_USED_MEMORY="false"
+           IS_CPU_LOAD="false" IS_NETWORK_LOAD="false">
+        <MAX_HEAP_DUMPS>3</MAX_HEAP_DUMPS>
+        <MAX_THREAD_DUMPS>6</MAX_THREAD_DUMPS>
+        <EVENT_PERIOD>4999</EVENT_PERIOD>
+    </event>
+    <event name="UnresponsiveESBEvent"  CREATE_HEAP_DUMPS="false" CREATE_THREAD_DUMPS="false" IS_USED_MEMORY="false"
+           IS_CPU_LOAD="false" IS_NETWORK_LOAD="false">
+        <MAX_HEAP_DUMPS>3</MAX_HEAP_DUMPS>
+        <MAX_THREAD_DUMPS>6</MAX_THREAD_DUMPS>
+        <EVENT_PERIOD>4999</EVENT_PERIOD>
+    </event>
+
+</configuration>
