@@ -85,7 +85,8 @@ public class ThreadDumpCreator {
     public synchronized void getMbeanInfo() {
         threadDumpInProgress = true;
         StringBuilder dump = new StringBuilder();
-        filePath=config.getConfigurationBean().getThreadDumpPath();
+        //filePath=config.getConfigurationBean().getThreadDumpPath();
+        filePath="./"+filePath;
         try {
             bean = new ObjectName(THREAD_DUMP_BEAN_NAME);
             memoryInfo = remoteConnector.getRemote().getMBeanInfo(bean);
@@ -125,6 +126,7 @@ public class ThreadDumpCreator {
                 byte [] data = dump.toString().getBytes(Charset.forName("UTF-8"));
                 threadDumpName="ThreadDump"+new Date().toString().replaceAll(":","")+".txt";
                 FileWriter.writeFile(filePath+threadDumpName,data);
+                //logger.debug("File path :" +filePath+threadDumpName);
             }
 
         } catch (MalformedObjectNameException e) {

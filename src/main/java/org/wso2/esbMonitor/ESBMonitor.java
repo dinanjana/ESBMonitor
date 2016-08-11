@@ -19,6 +19,7 @@
 
 package org.wso2.esbMonitor;
 
+import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.DBConnector;
 import org.wso2.esbMonitor.connector.RemoteConnector;
@@ -42,9 +43,9 @@ import java.sql.SQLException;
  *
  */
 public class ESBMonitor {
-
+      private static Logger logger = Logger.getLogger(ESBMonitor.class);
       public static void main(String[] args) throws IOException {
-
+          logger.info("Starting WSO2 ESB Flight Recorder");
           Configuration config = Configuration.getInstance();
           //initializing factory classes
           ConnectorFactory connectorFactory = new ConnectorFactory();

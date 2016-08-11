@@ -60,7 +60,11 @@ public class PersistenceService {
                          "  requestType INTEGER\n" +
                          ")");
         }catch (SQLException e){
-            logger.info("Table already exist" , e);
+            if(e.getSQLState().equals("X0Y32")){
+                logger.info("Table already created");
+            }else {
+                logger.error("Error :",e);
+            }
         }
         catch (Exception e){
             logger.error("Table already exist",e);

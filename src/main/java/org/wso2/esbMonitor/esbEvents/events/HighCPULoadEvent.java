@@ -30,7 +30,9 @@ import org.wso2.esbMonitor.esbEvents.Event;
 import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
 import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
 import org.wso2.esbMonitor.network.NetworkFactory;
+import org.wso2.esbMonitor.utils.ZipArchiveCreator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,6 +55,7 @@ public class HighCPULoadEvent extends Event{
     private EventConfiguration eventConfiguration;
     private  boolean createThreadDumps;
     private boolean createHeapDumps;
+    private final String DIR_NAME="Thread dumps";
 
     protected HighCPULoadEvent (){
         eventConfiguration= Configuration.getInstance().getEventConfigurations().
@@ -78,6 +81,9 @@ public class HighCPULoadEvent extends Event{
         heapDumpsCreated=0;
         threadDumpsNames.clear();
         heapDumpsNames.clear();
+        ZipArchiveCreator zip = new ZipArchiveCreator("./"+eventStartTime+".zip","./"+eventStartTime);
+        zip.generateFileList(new File("./"+eventStartTime));
+        zip.zipIt();
     }
 
     /**This method is called when a
@@ -86,6 +92,8 @@ public class HighCPULoadEvent extends Event{
     public synchronized void initEvent(){
         eventStartTime=System.currentTimeMillis();
         setEventEndTime(eventPeriod + System.currentTimeMillis());
+        createDir(String.valueOf(eventStartTime)+"/"+DIR_NAME);
+        threadDumpCreator.setFilePath(String.valueOf(eventStartTime)+"/"+DIR_NAME+"/");
         logger.info("New High CPU Load event started.Ends on "+getEventEndTime()+
                     " Maximum of "+maxNumOfThreadDumps + " and maximum of "+maxNumOfHeapDumps
                     +" will be created.");

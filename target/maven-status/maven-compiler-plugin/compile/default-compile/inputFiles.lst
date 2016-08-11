@@ -6,6 +6,7 @@ E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\tasks\DBClean
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\utils\FileWriter.java
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\esbEvents\ESBStatus.java
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\persistance\PersistenceServiceFactory.java
+E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\pingReceiver\ErrorLogExtractor.java
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\dumpHandlers\HeapDumper.java
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\connector\GMailConnector.java
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\esbEvents\events\UnresponsiveESBEvent.java
@@ -34,6 +35,5 @@ E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\dumpHandlers\
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\configuration\ConfigurationBean.java
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\tasks\DBTaskRunner.java
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\jvmDetails\JVMDetails.java
-E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\pingReceiver\ErrorLogCreator.java
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\esbEvents\Event.java
 E:\Project\esbMonitor\EsbMonitor\src\main\java\org\wso2\esbMonitor\tasks\TaskFactory.java

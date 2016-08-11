@@ -19,6 +19,8 @@
 
 package org.wso2.esbMonitor.esbEvents;
 
+import org.wso2.esbMonitor.utils.FileWriter;
+
 import java.util.Observable;
 
 /**
@@ -52,5 +54,13 @@ public abstract class Event extends Observable{
 
     public long getEventEndTime(){
         return this.eventEndtime;
+    }
+
+    /**
+     * Creates a new directory to save info of
+     * this event
+     * @param  dirName new directory's name*/
+    public void createDir(String dirName){
+        FileWriter.createDir(dirName,false);
     }
 }
