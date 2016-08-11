@@ -19,7 +19,7 @@
 
 package org.wso2.esbMonitor.esbEvents;
 
-import org.wso2.esbMonitor.utils.FileWriter;
+import org.wso2.esbMonitor.utils.FileHandler;
 
 import java.util.Observable;
 
@@ -61,6 +61,6 @@ public abstract class Event extends Observable{
      * this event
      * @param  dirName new directory's name*/
     public void createDir(String dirName){
-        FileWriter.createDir(dirName,false);
+        FileHandler.createDir(dirName, false);
     }
 }

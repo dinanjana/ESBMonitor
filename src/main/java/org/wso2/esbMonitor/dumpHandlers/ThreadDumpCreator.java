@@ -22,7 +22,7 @@ package org.wso2.esbMonitor.dumpHandlers;
 import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
-import org.wso2.esbMonitor.utils.FileWriter;
+import org.wso2.esbMonitor.utils.FileHandler;
 
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
@@ -125,7 +125,7 @@ public class ThreadDumpCreator {
                 dump.append("\n\n");
                 byte [] data = dump.toString().getBytes(Charset.forName("UTF-8"));
                 threadDumpName="ThreadDump"+new Date().toString().replaceAll(":","")+".txt";
-                FileWriter.writeFile(filePath+threadDumpName,data);
+                FileHandler.writeFile(filePath + threadDumpName, data);
                 //logger.debug("File path :" +filePath+threadDumpName);
             }
 

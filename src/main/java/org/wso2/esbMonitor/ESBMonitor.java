@@ -21,23 +21,20 @@ package org.wso2.esbMonitor;
 
 import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
+import org.wso2.esbMonitor.reporting.ReportTemplate;
 import org.wso2.esbMonitor.connector.DBConnector;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.connector.ConnectorFactory;
-import org.wso2.esbMonitor.esbEvents.Event;
 import org.wso2.esbMonitor.esbEvents.events.EventFactory;
 import org.wso2.esbMonitor.esbEvents.events.HighCPULoadEvent;
 import org.wso2.esbMonitor.esbEvents.events.HighRequestCountEvent;
 import org.wso2.esbMonitor.esbEvents.events.OOMEvent;
 import org.wso2.esbMonitor.esbEvents.events.UnresponsiveESBEvent;
-import org.wso2.esbMonitor.persistance.PersistenceService;
 import org.wso2.esbMonitor.persistance.PersistenceServiceFactory;
-import org.wso2.esbMonitor.pingReceiver.PingHandler;
 import org.wso2.esbMonitor.reporting.ReportCreator;
 import org.wso2.esbMonitor.tasks.*;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  *
@@ -47,6 +44,7 @@ public class ESBMonitor {
       public static void main(String[] args) throws IOException {
           logger.info("Starting WSO2 ESB Flight Recorder");
           Configuration config = Configuration.getInstance();
+          ReportTemplate.getReportTemplateInstance();
           //initializing factory classes
           ConnectorFactory connectorFactory = new ConnectorFactory();
           TaskFactory taskFactory = new TaskFactory();

@@ -21,8 +21,10 @@ package org.wso2.esbMonitor.utils;
 
 import org.apache.log4j.Logger;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,8 +33,8 @@ import java.nio.file.StandardOpenOption;
 /**
  * Created by Dinanjana on 01/06/2016.
  */
-public class FileWriter {
-    private static Logger logger = Logger.getLogger(FileWriter.class);
+public class FileHandler {
+    private static Logger logger = Logger.getLogger(FileHandler.class);
 
     /**
      * Creates a new directory in the classpath
@@ -64,5 +66,20 @@ public class FileWriter {
         } catch (IOException e) {
             logger.error("File writing error",e);
         }
+    }
+
+    public static String readFile(String fileName){
+        Charset charset = Charset.forName("US-ASCII");
+        Path file = Paths.get(fileName);
+        String line = null;
+        try (BufferedReader reader = Files.newBufferedReader(file, charset)) {
+            String line1=null;
+            while ((line1 = reader.readLine()) != null) {
+                line=line+line1;
+            }
+        } catch (IOException x) {
+            System.err.format("IOException: %s%n", x);
+        }
+        return line;
     }
 }

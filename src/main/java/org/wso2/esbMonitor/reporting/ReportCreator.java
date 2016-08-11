@@ -20,15 +20,11 @@
 package org.wso2.esbMonitor.reporting;
 
 import org.apache.log4j.Logger;
-import org.wso2.esbMonitor.esbEvents.Event;
 import org.wso2.esbMonitor.esbEvents.events.HighCPULoadEvent;
 import org.wso2.esbMonitor.esbEvents.events.HighRequestCountEvent;
 import org.wso2.esbMonitor.esbEvents.events.OOMEvent;
 import org.wso2.esbMonitor.esbEvents.events.UnresponsiveESBEvent;
-import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
-import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
-import org.wso2.esbMonitor.network.PassThruHTTPSenderAndReciever;
-import org.wso2.esbMonitor.utils.FileWriter;
+import org.wso2.esbMonitor.utils.FileHandler;
 
 import java.nio.charset.Charset;
 import java.util.Observable;
@@ -44,6 +40,7 @@ public class ReportCreator implements Observer {
     private HighRequestCountEvent highRequestCountEvent;
     private static ReportCreator instance;
     private Logger logger = Logger.getLogger(ReportCreator.class);
+    private ReportTemplate reportTemplate = ReportTemplate.getReportTemplateInstance();
 
     private ReportCreator(){
 
@@ -61,23 +58,25 @@ public class ReportCreator implements Observer {
         logger.info("Notification received");
         if(o==oomEvent && o instanceof OOMEvent){
             logger.info("OOM Event notified");
-            byte[] data=((OOMEvent) o).getValue().getBytes(Charset.forName("UTF-8"));
-            FileWriter.writeFile("Report.txt",data);
+            String data0=((OOMEvent) o).getValue();
+            data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
+            byte[] data=data0.getBytes(Charset.forName("UTF-8"));
+            FileHandler.writeFile(((OOMEvent) o).getEventDir()+"/Report.html", data);
         }
         if(o==highCPULoadEvent && o instanceof HighCPULoadEvent){
             logger.info("Notified observer");
             byte[] data = ((HighCPULoadEvent) o).getValue().getBytes(Charset.forName("UTF-8"));
-            FileWriter.writeFile("Report.txt",data);
+            FileHandler.writeFile("Report.txt", data);
         }
         if(o==highRequestCountEvent && o instanceof HighRequestCountEvent){
             logger.info("Notified observer");
             byte[] data = ((HighRequestCountEvent) o).getValue().getBytes(Charset.forName("UTF-8"));
-            FileWriter.writeFile("Report.txt",data);
+            FileHandler.writeFile("Report.txt", data);
         }
         if(o==unresponsiveESBEvent && o instanceof UnresponsiveESBEvent){
             logger.info("Notified observer");
             byte[] data = ((UnresponsiveESBEvent) o).getValue().getBytes(Charset.forName("UTF-8"));
-            FileWriter.writeFile("Report.txt",data);
+            FileHandler.writeFile("Report.txt", data);
         }
     }
 

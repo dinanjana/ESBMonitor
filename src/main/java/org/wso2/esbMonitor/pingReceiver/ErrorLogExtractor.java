@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.configuration.EventConfiguration;
 import org.wso2.esbMonitor.esbEvents.ESBStatus;
-import org.wso2.esbMonitor.utils.FileWriter;
+import org.wso2.esbMonitor.utils.FileHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -82,7 +82,7 @@ public class ErrorLogExtractor extends PingHandler {
     }
 
     public void writeErrorLogToFile(String fileName,String data){
-        FileWriter.writeFile(fileName,data.getBytes(Charset.forName("UTF-8")));
+        FileHandler.writeFile(fileName, data.getBytes(Charset.forName("UTF-8")));
     }
 
 }

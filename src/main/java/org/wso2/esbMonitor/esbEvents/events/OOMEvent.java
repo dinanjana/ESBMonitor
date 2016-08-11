@@ -58,6 +58,7 @@ public class OOMEvent extends Event {
     private  boolean createThreadDumps;
     private boolean createHeapDumps;
     private final String DIR_NAME="Thread dumps";
+    private String eventDir=null;
 
     protected OOMEvent (){
         eventConfiguration= Configuration.getInstance().getEventConfigurations().
@@ -94,11 +95,12 @@ public class OOMEvent extends Event {
     public synchronized void initEvent(){
         eventStartTime=System.currentTimeMillis();
         setEventEndTime(eventPeriod + System.currentTimeMillis());
-        createDir(String.valueOf(eventStartTime)+"/"+DIR_NAME);
-        threadDumpCreator.setFilePath(String.valueOf(eventStartTime)+"/"+DIR_NAME+"/");
-        logger.info("New OOM event started.Ends on "+getEventEndTime()+
-                    " Maximum of "+maxNumOfThreadDumps + " and maximum of "+maxNumOfHeapDumps
-                    +" will be created.");
+        eventDir=ESBStatus.OOM_EVENT+" "+String.valueOf(eventStartTime);
+        createDir(eventDir+"/"+DIR_NAME);
+        threadDumpCreator.setFilePath(eventDir+"/"+DIR_NAME+"/");
+        logger.info("New OOM event started.Ends on " + getEventEndTime() +
+                    " Maximum of " + maxNumOfThreadDumps + " and maximum of " + maxNumOfHeapDumps
+                    + " will be created.");
     }
 
     /**This method is called
@@ -155,5 +157,9 @@ public class OOMEvent extends Event {
                      +config.getConfigurationBean().getThreadDumpPath()+ "\nOther parameters collected at the moment of " +
                      "incident are : "+healthDet;
         return ret;
+    }
+
+    public String getEventDir() {
+        return eventDir;
     }
 }
