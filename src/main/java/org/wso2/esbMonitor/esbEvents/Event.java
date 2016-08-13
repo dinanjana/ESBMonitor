@@ -19,14 +19,36 @@
 
 package org.wso2.esbMonitor.esbEvents;
 
+import org.wso2.esbMonitor.configuration.EventConfiguration;
+import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
+import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
 import org.wso2.esbMonitor.utils.FileHandler;
+import org.wso2.esbMonitor.utils.ZipArchiveCreator;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 
 /**
  * Created by Dinanjana on 17/07/2016.
  */
 public abstract class Event extends Observable{
+    protected ThreadDumpCreator threadDumpCreator;
+    protected HeapDumper heapDumper;
+    protected int maxNumOfThreadDumps;
+    protected int maxNumOfHeapDumps;
+    protected long threadDumpsCreated;
+    protected long heapDumpsCreated;
+    protected List<String> threadDumpsNames = new ArrayList<>();
+    protected List<String> heapDumpsNames = new ArrayList<>();
+    protected long eventPeriod;
+    protected long eventStartTime;
+    protected EventConfiguration eventConfiguration;
+    protected   boolean createThreadDumps;
+    protected boolean createHeapDumps;
+    protected final String DIR_NAME="Thread dumps";
+    protected String eventDir=null;
 
     private long eventEndtime;
     /**This method is called when a
@@ -40,7 +62,17 @@ public abstract class Event extends Observable{
     /**This method is called when a event is
      * finished
      * */
-    public abstract void resetEvent();
+    public void resetEvent(){
+        setChanged();
+        notifyObservers();
+        threadDumpsCreated=0;
+        heapDumpsCreated=0;
+        threadDumpsNames.clear();
+        heapDumpsNames.clear();
+        ZipArchiveCreator zip = new ZipArchiveCreator("./"+eventDir+".zip","./"+eventDir);
+        zip.generateFileList(new File("./"+eventDir));
+        zip.zipIt();
+    }
 
     public abstract String getValue();
 
@@ -62,5 +94,9 @@ public abstract class Event extends Observable{
      * @param  dirName new directory's name*/
     public void createDir(String dirName){
         FileHandler.createDir(dirName, false);
+    }
+
+    public String getEventDir() {
+        return eventDir;
     }
 }

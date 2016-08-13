@@ -77,6 +77,16 @@ public class ZipArchiveCreator {
         }catch(IOException ex){
             ex.printStackTrace();
         }
+        finally {
+            File file = new File(sourceFolder);
+            if(file.exists()){
+                try {
+                    FileHandler.delete(file);
+                } catch (IOException e) {
+                    logger.error("Error" , e);
+                }
+            }
+        }
     }
 
     /**
@@ -104,8 +114,10 @@ public class ZipArchiveCreator {
      * @return Formatted file path
      */
     private String generateZipEntry(String file){
-        logger.info(file.substring(sourceFolder.length()+1, file.length()));
-        String path = file.substring(sourceFolder.length()+1, file.length());
+
+        //File file1= new File("./");
+        String path = file.substring(new File("./").getAbsolutePath().length()+1, file.length());
+        logger.info("Path: "+ path);
         if(path.contains("nitor\\EsbMonitor\\")){
             path=path.replace("nitor\\EsbMonitor\\","");
             logger.debug(path);

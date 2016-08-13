@@ -49,8 +49,8 @@ public class PersistenceService {
             stmt= conn.createStatement();
             stmt.execute("CREATE TABLE HTTP_LOG(\n" +
                          "  activeThreadCount INTEGER,\n" +
-                         "  avgSizeRecieved DECIMAL(3,2),\n" +
-                         "  avgSizeSent DECIMAL(3,2),\n" +
+                         "  avgSizeRecieved DECIMAL(30,20),\n" +
+                         "  avgSizeSent DECIMAL(30,20),\n" +
                          "  faultsRecieving INTEGER,\n" +
                          "  faultsSending INTEGER,\n" +
                          "  messagesRecieved INTEGER,\n" +

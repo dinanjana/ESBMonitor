@@ -42,20 +42,20 @@ import java.util.List;
  */
 public class HighRequestCountEvent extends Event {
     private final Logger logger = Logger.getLogger(HighRequestCountEvent.class);
-    private ThreadDumpCreator threadDumpCreator;
-    private HeapDumper heapDumper;
-    private int maxNumOfThreadDumps;
-    private int maxNumOfHeapDumps;
-    private long threadDumpsCreated;
-    private long heapDumpsCreated;
-    private List<String> threadDumpsNames = new ArrayList<>();
-    private List<String> heapDumpsNames = new ArrayList<>();
-    private long eventPeriod;
-    private long eventStartTime;
-    private EventConfiguration eventConfiguration;
-    private  boolean createThreadDumps;
-    private boolean createHeapDumps;
-    private final String DIR_NAME="Thread dumps";
+//    private ThreadDumpCreator threadDumpCreator;
+//    private HeapDumper heapDumper;
+//    private int maxNumOfThreadDumps;
+//    private int maxNumOfHeapDumps;
+//    private long threadDumpsCreated;
+//    private long heapDumpsCreated;
+//    private List<String> threadDumpsNames = new ArrayList<>();
+//    private List<String> heapDumpsNames = new ArrayList<>();
+//    private long eventPeriod;
+//    private long eventStartTime;
+//    private EventConfiguration eventConfiguration;
+//    private  boolean createThreadDumps;
+//    private boolean createHeapDumps;
+//    private final String DIR_NAME="Thread dumps";
 
     protected HighRequestCountEvent(){
         eventConfiguration= Configuration.getInstance().getEventConfigurations().
@@ -72,8 +72,9 @@ public class HighRequestCountEvent extends Event {
     @Override
     public void initEvent() {
         eventStartTime=System.currentTimeMillis();
-        createDir(String.valueOf(eventStartTime)+"/"+DIR_NAME);
-        threadDumpCreator.setFilePath(String.valueOf(eventStartTime)+"/"+DIR_NAME+"/");
+        eventDir=ESBStatus.HIGH_REQUEST_COUNT+" "+String.valueOf(eventStartTime);
+        createDir(eventDir+"/"+DIR_NAME);
+        threadDumpCreator.setFilePath(eventDir+"/"+DIR_NAME+"/");
         setEventEndTime(eventPeriod + System.currentTimeMillis());
         logger.info("New High Request Count event started.Ends on "+getEventEndTime()+
                     " Maximum of "+maxNumOfThreadDumps + " and maximum of "+maxNumOfHeapDumps
@@ -101,18 +102,6 @@ public class HighRequestCountEvent extends Event {
         }
     }
 
-    @Override
-    public void resetEvent() {
-        setChanged();
-        notifyObservers();
-        threadDumpsCreated=0;
-        heapDumpsCreated=0;
-        threadDumpsNames.clear();
-        heapDumpsNames.clear();
-        ZipArchiveCreator zip = new ZipArchiveCreator("./"+eventStartTime+".zip","./"+eventStartTime);
-        zip.generateFileList(new File("./"+eventStartTime));
-        zip.zipIt();
-    }
 
     @Override
     public synchronized String  getValue(){

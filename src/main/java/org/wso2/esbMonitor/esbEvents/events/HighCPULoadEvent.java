@@ -42,20 +42,21 @@ import java.util.List;
  */
 public class HighCPULoadEvent extends Event{
     private final Logger logger = Logger.getLogger(HighCPULoadEvent.class);
-    private ThreadDumpCreator threadDumpCreator;
-    private HeapDumper heapDumper;
-    private int maxNumOfThreadDumps;
-    private int maxNumOfHeapDumps;
-    private long threadDumpsCreated;
-    private long heapDumpsCreated;
-    private List<String> threadDumpsNames = new ArrayList<>();
-    private List<String> heapDumpsNames = new ArrayList<>();
-    private long eventPeriod;
-    private long eventStartTime;
-    private EventConfiguration eventConfiguration;
-    private  boolean createThreadDumps;
-    private boolean createHeapDumps;
-    private final String DIR_NAME="Thread dumps";
+//    private ThreadDumpCreator threadDumpCreator;
+//    private HeapDumper heapDumper;
+//    private int maxNumOfThreadDumps;
+//    private int maxNumOfHeapDumps;
+//    private long threadDumpsCreated;
+//    private long heapDumpsCreated;
+//    private List<String> threadDumpsNames = new ArrayList<>();
+//    private List<String> heapDumpsNames = new ArrayList<>();
+//    private long eventPeriod;
+//    private long eventStartTime;
+//    private EventConfiguration eventConfiguration;
+//    private  boolean createThreadDumps;
+//    private boolean createHeapDumps;
+//    private final String DIR_NAME="Thread dumps";
+//    private String eventDir=null;
 
     protected HighCPULoadEvent (){
         eventConfiguration= Configuration.getInstance().getEventConfigurations().
@@ -70,21 +71,6 @@ public class HighCPULoadEvent extends Event{
         createThreadDumps=eventConfiguration.isCreateThreadDumps();
     }
 
-    /**This method is called when a event is
-     * finished
-     * */
-
-    public synchronized void resetEvent(){
-        setChanged();
-        notifyObservers();
-        threadDumpsCreated=0;
-        heapDumpsCreated=0;
-        threadDumpsNames.clear();
-        heapDumpsNames.clear();
-        ZipArchiveCreator zip = new ZipArchiveCreator("./"+eventStartTime+".zip","./"+eventStartTime);
-        zip.generateFileList(new File("./"+eventStartTime));
-        zip.zipIt();
-    }
 
     /**This method is called when a
      *new event detected
@@ -92,8 +78,9 @@ public class HighCPULoadEvent extends Event{
     public synchronized void initEvent(){
         eventStartTime=System.currentTimeMillis();
         setEventEndTime(eventPeriod + System.currentTimeMillis());
-        createDir(String.valueOf(eventStartTime)+"/"+DIR_NAME);
-        threadDumpCreator.setFilePath(String.valueOf(eventStartTime)+"/"+DIR_NAME+"/");
+        eventDir=ESBStatus.HIGH_CPU_LOAD+" "+String.valueOf(eventStartTime);
+        createDir(eventDir+"/"+DIR_NAME);
+        threadDumpCreator.setFilePath(eventDir+"/"+DIR_NAME+"/");
         logger.info("New High CPU Load event started.Ends on "+getEventEndTime()+
                     " Maximum of "+maxNumOfThreadDumps + " and maximum of "+maxNumOfHeapDumps
                     +" will be created.");
@@ -154,4 +141,7 @@ public class HighCPULoadEvent extends Event{
                "incident are : "+healthDet;
 
     }
+//    public String getEventDir() {
+//        return eventDir;
+//    }
 }

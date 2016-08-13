@@ -23,9 +23,11 @@ import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -63,7 +65,14 @@ public class FileHandler {
             }else {
                 Files.write(file, data);
             }
-        } catch (IOException e) {
+        }catch (NoSuchFileException e){
+            try {
+                Files.write(file,data);
+            } catch (IOException e1) {
+                logger.error("Error :" ,e);
+            }
+        }
+        catch (IOException e) {
             logger.error("File writing error",e);
         }
     }
@@ -81,5 +90,40 @@ public class FileHandler {
             System.err.format("IOException: %s%n", x);
         }
         return line;
+    }
+
+    /**
+     * Deletes directory with files
+     * @param file directory which needs to be deleted
+     * */
+    public static void delete(File file)
+            throws IOException{
+        if(file.isDirectory()){
+            //directory is empty, then delete it
+            if(file.list().length==0){
+                file.delete();
+                logger.debug("Directory is deleted : "
+                             + file.getAbsolutePath());
+            }else{
+                //list all the directory contents
+                String files[] = file.list();
+                for (String temp : files) {
+                    //construct the file structure
+                    File fileDelete = new File(file, temp);
+                    //recursive delete
+                    delete(fileDelete);
+                }
+                //check the directory again, if empty then delete it
+                if(file.list().length==0){
+                    file.delete();
+                    logger.debug("Directory is deleted : "
+                                 + file.getAbsolutePath());
+                }
+            }
+        }else{
+            //if file, then delete it
+            file.delete();
+            logger.debug("File is deleted : " + file.getAbsolutePath());
+        }
     }
 }

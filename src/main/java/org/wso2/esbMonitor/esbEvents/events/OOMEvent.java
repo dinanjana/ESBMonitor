@@ -44,21 +44,6 @@ import java.util.List;
  */
 public class OOMEvent extends Event {
     private final Logger logger = Logger.getLogger(OOMEvent.class);
-    private ThreadDumpCreator threadDumpCreator;
-    private HeapDumper heapDumper;
-    private int maxNumOfThreadDumps;
-    private int maxNumOfHeapDumps;
-    private long threadDumpsCreated;
-    private long heapDumpsCreated;
-    private List<String> threadDumpsNames = new ArrayList<>();
-    private List<String> heapDumpsNames = new ArrayList<>();
-    private long eventPeriod;
-    private long eventStartTime;
-    private EventConfiguration eventConfiguration;
-    private  boolean createThreadDumps;
-    private boolean createHeapDumps;
-    private final String DIR_NAME="Thread dumps";
-    private String eventDir=null;
 
     protected OOMEvent (){
         eventConfiguration= Configuration.getInstance().getEventConfigurations().
@@ -73,21 +58,6 @@ public class OOMEvent extends Event {
         createThreadDumps=eventConfiguration.isCreateThreadDumps();
     }
 
-    /**This method is called when a event is
-     * finished
-     * */
-
-    public synchronized void resetEvent(){
-        setChanged();
-        notifyObservers();
-        threadDumpsCreated=0;
-        heapDumpsCreated=0;
-        threadDumpsNames.clear();
-        heapDumpsNames.clear();
-        ZipArchiveCreator zip = new ZipArchiveCreator("./"+eventStartTime+".zip","./"+eventStartTime);
-        zip.generateFileList(new File("./"+eventStartTime));
-        zip.zipIt();
-    }
 
     /**This method is called when a
      *new event detected
@@ -159,7 +129,7 @@ public class OOMEvent extends Event {
         return ret;
     }
 
-    public String getEventDir() {
-        return eventDir;
-    }
+//    public String getEventDir() {
+//        return eventDir;
+//    }
 }
