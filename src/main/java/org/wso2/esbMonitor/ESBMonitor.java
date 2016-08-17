@@ -105,7 +105,7 @@ public class ESBMonitor {
           dbTaskRunner.start();
           dbCleanerTask.start();
           esbStatusCheckerTask.start();
-          //new PingHandler().start();
+
 
     }
 }

@@ -123,11 +123,11 @@ public class ThreadDumpCreator {
                                             (fileName != null ? "(" + fileName + ")" : "(Unknown Source)"))));
                 }
                 dump.append("\n\n");
-                byte [] data = dump.toString().getBytes(Charset.forName("UTF-8"));
-                threadDumpName="ThreadDump"+new Date().toString().replaceAll(":","")+".txt";
-                FileHandler.writeFile(filePath + threadDumpName, data);
-                //logger.debug("File path :" +filePath+threadDumpName);
             }
+            byte [] data = dump.toString().getBytes(Charset.forName("UTF-8"));
+            threadDumpName="ThreadDump"+new Date().toString().replaceAll(":"," ")+".txt";
+            FileHandler.writeFile(filePath + threadDumpName, data);
+            logger.debug("File path :" +filePath+threadDumpName);
 
         } catch (MalformedObjectNameException e) {
             logger.error("Error" , e);

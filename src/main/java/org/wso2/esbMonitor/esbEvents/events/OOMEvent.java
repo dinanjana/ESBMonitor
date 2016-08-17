@@ -85,7 +85,7 @@ public class OOMEvent extends Event {
                 threadDumpCreator.getMbeanInfo();
                 threadDumpsNames.add(threadDumpCreator.getThreadDumpName());
                 threadDumpsCreated++;
-                logger.info("Thread dump created");
+                logger.info("Thread dump created for OOM");
             }
             if(heapDumpsCreated <= maxNumOfHeapDumps && createHeapDumps){
                 heapDumper = new HeapDumper(Configuration.getInstance(),new ConnectorFactory().getRemoteConnectorInstance());

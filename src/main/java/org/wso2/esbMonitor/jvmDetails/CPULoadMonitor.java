@@ -67,7 +67,7 @@ public class CPULoadMonitor extends JVMDetails {
         //If the load average is not available, a negative value is returned.
         double cpuLoad = operatingSystemMXBean.getSystemLoadAverage();
         currentCPULoad=cpuLoad;
-        if (cpuLoad < this.cpuLoad) {
+        if (cpuLoad > this.cpuLoad) {
             logger.info(":High CPU load");
             if(!eventDetected){
                 highCPULoadEvent.initEvent();

@@ -61,7 +61,7 @@ public class FileHandler {
         Path file = Paths.get(fileName);
         try {
             if(Files.exists(file)){
-                Files.write(file, data, StandardOpenOption.APPEND);
+                Files.write(file, data, StandardOpenOption.WRITE);
             }else {
                 Files.write(file, data);
             }
