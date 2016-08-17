@@ -24,6 +24,7 @@ import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.connector.RemoteConnector;
 import org.wso2.esbMonitor.connector.ConnectorFactory;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
+import org.wso2.esbMonitor.esbEvents.events.EventFactory;
 import org.wso2.esbMonitor.network.NetworkFactory;
 import org.wso2.esbMonitor.network.PassThruHTTPSenderAndReciever;
 
@@ -58,20 +59,24 @@ public class NetworkMonitor extends Thread {
 
         passThruHTTPSender.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
         passThruHTTPSender.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
+        passThruHTTPSender.setEvent(EventFactory.getHighRequestCountEvents()[0]);
         passThruHTTPReciever.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
         passThruHTTPReciever.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
+        passThruHTTPReciever.setEvent(EventFactory.getHighRequestCountEvents()[1]);
         passThruHTTPSReciever.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
         passThruHTTPSReciever.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
+        passThruHTTPSReciever.setEvent(EventFactory.getHighRequestCountEvents()[2]);
         passThruHTTPSSender.setMaxQueueSize(config.getConfigurationBean().getMaxReqestqueueSize());
         passThruHTTPSSender.setMaxThreadCount(config.getConfigurationBean().getHttpRequests());
+        passThruHTTPSSender.setEvent(EventFactory.getHighRequestCountEvents()[3]);
     }
     public void run(){
         initTask();
         while (true){
             passThruHTTPSender.getMbeanInfo();
-            passThruHTTPReciever.getMbeanInfo();
-            passThruHTTPSSender.getMbeanInfo();
-            passThruHTTPSReciever.getMbeanInfo();
+//            passThruHTTPReciever.getMbeanInfo();
+//            passThruHTTPSSender.getMbeanInfo();
+//            passThruHTTPSReciever.getMbeanInfo();
             try {
                 Thread.sleep(waitTime);
             } catch (InterruptedException e) {

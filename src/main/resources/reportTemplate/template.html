@@ -1,12 +1,32 @@
 <!DOCTYPE html>
 <html>
 <body>
-
-<h1>WSO2 ESB FLIGHT RECORDER</h1>
-
+<style>
+    body {
+        background-color: lightgrey;
+        font-family: "Arial Black", Helvetica, sans-serif;
+        /*font-size: 16em;*/
+        color: black;
+    }
+</style>
+<script>
+    function populatePre(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            document.getElementById('contents').textContent = this.responseText;
+        };
+        xhr.open('GET', url);
+        xhr.send();
+    }
+    populatePre('path/to/file.txt');
+</script>
+<section>
+    <h1>WSO2 ESB FLIGHT RECORDER</h1>
+</section>
+<section>
 <h3>EVENT_DESCRIPTION</h3>
-<a href="/Thread dumps">Thread dumps that were generated during the event can be found at "Thread dumps" directory</a><br>
-<a href="/Error logs">Error log extracted during the event can be found at "Error logs" directory.</a>
-
+    <a href="/Thread dumps">Thread dumps that were generated during the event can be found at "Thread dumps" directory</a><br>
+    <a href="/Error logs">Error log extracted during the event can be found at "Error logs" directory.</a>
+</section>
 </body>
 </html>

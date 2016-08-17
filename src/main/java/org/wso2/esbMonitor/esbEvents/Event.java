@@ -45,7 +45,7 @@ public abstract class Event extends Observable{
     protected long eventPeriod;
     protected long eventStartTime;
     protected EventConfiguration eventConfiguration;
-    protected   boolean createThreadDumps;
+    protected boolean createThreadDumps;
     protected boolean createHeapDumps;
     protected final String DIR_NAME="Thread dumps";
     protected String eventDir=null;
@@ -69,7 +69,7 @@ public abstract class Event extends Observable{
         heapDumpsCreated=0;
         threadDumpsNames.clear();
         heapDumpsNames.clear();
-        ZipArchiveCreator zip = new ZipArchiveCreator("./"+eventDir+".zip","./"+eventDir);
+        ZipArchiveCreator zip = new ZipArchiveCreator("./reports/"+eventDir+".zip","./"+eventDir);
         zip.generateFileList(new File("./"+eventDir));
         zip.zipIt();
     }

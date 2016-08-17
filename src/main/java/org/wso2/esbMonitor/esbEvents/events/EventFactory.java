@@ -25,16 +25,21 @@ package org.wso2.esbMonitor.esbEvents.events;
 public class EventFactory {
     private static OOMEvent oomEvent=null;
     private static HighCPULoadEvent highCPULoadEvent=null;
-    private static HighRequestCountEvent highRequestCountEvent=null;
+    private static HighRequestCountEvent [] highRequestCountEvents=new HighRequestCountEvent[4];
     private static UnresponsiveESBEvent unresponsiveESBEvent=null;
 
+    /**
+     * Returns OOM event instance
+     * */
     public static OOMEvent getOomEventInstance() {
         if(oomEvent == null){
             oomEvent=new OOMEvent();
         }
         return oomEvent;
     }
-
+    /**
+     * Returns High cpu load event event instance
+     * */
     public static HighCPULoadEvent getHighCPULoadEventInstance(){
         if(highCPULoadEvent==null){
             highCPULoadEvent=new HighCPULoadEvent();
@@ -43,16 +48,37 @@ public class EventFactory {
     }
 
     public static HighRequestCountEvent getHighRequestCountEventInstance(){
-        if(highRequestCountEvent==null){
-            highRequestCountEvent=new HighRequestCountEvent();
+//        if(highRequestCountEvent==null){
+//            highRequestCountEvent=new HighRequestCountEvent();
+//        }
+        for (int i = 0 ; i <highRequestCountEvents.length;i++){
+            if(highRequestCountEvents[i]==null){
+                highRequestCountEvents[i]=new HighRequestCountEvent();
+                return highRequestCountEvents[i];
+            }
         }
-        return highRequestCountEvent;
+        return null;
     }
 
+    /**
+     * Returns Unresponsive ESB event instance
+     * */
     public static UnresponsiveESBEvent getUnresponsiveEsbEventInstance(){
         if(unresponsiveESBEvent==null){
             unresponsiveESBEvent=new UnresponsiveESBEvent();
         }
         return unresponsiveESBEvent;
+    }
+
+    /**
+     * Returns High request count events instance
+     * */
+    public static HighRequestCountEvent[] getHighRequestCountEvents() {
+        for (int i = 0 ; i <highRequestCountEvents.length;i++){
+            if(highRequestCountEvents[i] == null){
+                highRequestCountEvents[i]=new HighRequestCountEvent();
+            }
+        }
+        return highRequestCountEvents;
     }
 }

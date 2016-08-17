@@ -50,7 +50,7 @@ public class PassThruHTTPSenderAndReciever {
     public PassThruHTTPSenderAndReciever(String bean,RemoteConnector remote){
         this.bean = bean;
         this.remote=remote;
-        event= EventFactory.getHighRequestCountEventInstance();
+        //event= EventFactory.getHighRequestCountEventInstance();
     }
 
     public void getMbeanInfo() {
@@ -135,6 +135,10 @@ public class PassThruHTTPSenderAndReciever {
 
     public void setMaxQueueSize(int maxQueueSize) {
         this.maxQueueSize = maxQueueSize;
+    }
+
+    public void setEvent(HighRequestCountEvent event){
+        this.event=event;
     }
 
     public int getCurrQueueSize() {

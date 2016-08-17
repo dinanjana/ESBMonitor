@@ -37,7 +37,7 @@ public class ReportCreator implements Observer {
     private OOMEvent oomEvent;
     private HighCPULoadEvent highCPULoadEvent;
     private UnresponsiveESBEvent unresponsiveESBEvent;
-    private HighRequestCountEvent highRequestCountEvent;
+    private HighRequestCountEvent [] highRequestCountEvents;
     private static ReportCreator instance;
     private Logger logger = Logger.getLogger(ReportCreator.class);
     private ReportTemplate reportTemplate = ReportTemplate.getReportTemplateInstance();
@@ -63,26 +63,32 @@ public class ReportCreator implements Observer {
             byte[] data=data0.getBytes(Charset.forName("UTF-8"));
             FileHandler.writeFile(((OOMEvent) o).getEventDir()+"/Report.html", data);
         }
-        if(o==highCPULoadEvent && o instanceof HighCPULoadEvent){
+        else if(o==highCPULoadEvent && o instanceof HighCPULoadEvent){
             logger.info("Notified observer");
             String data0=((HighCPULoadEvent) o).getValue();
             data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
             byte[] data=data0.getBytes(Charset.forName("UTF-8"));
             FileHandler.writeFile(((HighCPULoadEvent) o).getEventDir()+"/Report.html", data);
         }
-        if(o==highRequestCountEvent && o instanceof HighRequestCountEvent){
-            logger.info("Notified observer");
-            String data0=((HighRequestCountEvent) o).getValue();
-            data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
-            byte[] data=data0.getBytes(Charset.forName("UTF-8"));
-            FileHandler.writeFile(((HighRequestCountEvent) o).getEventDir()+"/Report.html", data);
-        }
-        if(o==unresponsiveESBEvent && o instanceof UnresponsiveESBEvent){
+
+        else if(o==unresponsiveESBEvent && o instanceof UnresponsiveESBEvent){
             logger.info("Notified observer");
             String data0=((UnresponsiveESBEvent) o).getValue();
             data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
             byte[] data=data0.getBytes(Charset.forName("UTF-8"));
             FileHandler.writeFile(((UnresponsiveESBEvent) o).getEventDir()+"/Report.html", data);
+        }else {
+            if(o instanceof HighRequestCountEvent){
+                logger.info("Notified observer on high request count");
+                for (HighRequestCountEvent highRequestCountEvent:highRequestCountEvents){
+                    if(o==highRequestCountEvent){
+                        String data0=((HighRequestCountEvent) o).getValue();
+                        data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
+                        byte[] data=data0.getBytes(Charset.forName("UTF-8"));
+                        FileHandler.writeFile(((HighRequestCountEvent) o).getEventDir()+"/Report.html", data);
+                    }
+                }
+            }
         }
     }
 
@@ -98,7 +104,7 @@ public class ReportCreator implements Observer {
         this.unresponsiveESBEvent = unresponsiveESBEvent;
     }
 
-    public void setHighRequestCountEvent(HighRequestCountEvent highRequestCountEvent) {
-        this.highRequestCountEvent = highRequestCountEvent;
+    public void setHighRequestCountEvent(HighRequestCountEvent []highRequestCountEvent) {
+        this.highRequestCountEvents = highRequestCountEvent;
     }
 }

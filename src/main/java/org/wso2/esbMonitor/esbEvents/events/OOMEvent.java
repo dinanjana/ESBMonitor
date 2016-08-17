@@ -98,27 +98,35 @@ public class OOMEvent extends Event {
     }
 
     public synchronized String  getValue(){
-        StringBuffer heapNames=new StringBuffer();
-        StringBuffer threadNames=new StringBuffer();
-        String healthDet="";
+        StringBuffer heapNames=new StringBuffer().append("<ol>");
+        StringBuffer threadNames=new StringBuffer().append("<ol>");
+        String healthDet="<ol>";
         for(String name:heapDumpsNames){
-            heapNames.append(name + " ,");
+            heapNames.append("<il>"+name + "</il>,");
         }
+        heapNames.append("</ol>");
+
         for (String name:threadDumpsNames){
-            threadNames.append(name+ " ,");
+            threadNames.append("<il>"+name+ "</il>,");
         }
+        threadNames.append("</ol>");
+
         if(eventConfiguration.isUsedMemory()){
-            healthDet= "\nUsed heap memory :"+ MemoryMonitor.getCurrentUsedMemory()/(1024*1024) + " mb";
+            healthDet= "<il>\nUsed heap memory :"+ MemoryMonitor.getCurrentUsedMemory()/(1024*1024) + " mb</il>";
         }
+
         if(eventConfiguration.isCPULoad()){
-            healthDet=healthDet+"\nCPU load :"+ CPULoadMonitor.getCurrentCPULoad();
+            healthDet=healthDet+"<il>\nCPU load :"+ CPULoadMonitor.getCurrentCPULoad()+"</il>";
         }
+
         if(eventConfiguration.isNetworkLoad()){
-            healthDet=healthDet+"\n HTTP receiver active thread count :" + NetworkFactory.
-                    getPassThruHTTPRecieverInstance().getCurrThreadCount();
-            healthDet=healthDet+"\n HTTPS receiver active thread count :" + NetworkFactory.
-                    getPassThruHTTPSRecieverInstance().getCurrThreadCount();
+            healthDet=healthDet+"<il>\n HTTP receiver active thread count :" + NetworkFactory.
+                    getPassThruHTTPRecieverInstance().getCurrThreadCount()+"</il>";
+            healthDet=healthDet+"<il>\n HTTPS receiver active thread count :" + NetworkFactory.
+                    getPassThruHTTPSRecieverInstance().getCurrThreadCount()+"</il>";
         }
+
+        healthDet=healthDet+"</ol>";
         Configuration config = Configuration.getInstance();
         Date date = new Date(eventStartTime);
         String ret = "\n\nOOM Event detected at "+ date+" \n"+heapDumpsCreated + " Heap dumps created.Names of them are "+

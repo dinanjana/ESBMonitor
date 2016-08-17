@@ -33,6 +33,7 @@ import org.wso2.esbMonitor.esbEvents.events.UnresponsiveESBEvent;
 import org.wso2.esbMonitor.persistance.PersistenceServiceFactory;
 import org.wso2.esbMonitor.reporting.ReportCreator;
 import org.wso2.esbMonitor.tasks.*;
+import org.wso2.esbMonitor.utils.FileHandler;
 
 import java.io.IOException;
 
@@ -43,6 +44,7 @@ public class ESBMonitor {
       private static Logger logger = Logger.getLogger(ESBMonitor.class);
       public static void main(String[] args) throws IOException {
           logger.info("Starting WSO2 ESB Flight Recorder");
+          FileHandler.createDir("reports",true);
           Configuration config = Configuration.getInstance();
           ReportTemplate.getReportTemplateInstance();
           //initializing factory classes
@@ -68,18 +70,21 @@ public class ESBMonitor {
           //List of observable event
           OOMEvent oomEvent = EventFactory.getOomEventInstance();
           HighCPULoadEvent highCPULoadEvent=EventFactory.getHighCPULoadEventInstance();
-          HighRequestCountEvent highRequestCountEvent=EventFactory.getHighRequestCountEventInstance();
+          HighRequestCountEvent[] highRequestCountEvents=EventFactory.getHighRequestCountEvents();
           UnresponsiveESBEvent unresponsiveESBEvent=EventFactory.getUnresponsiveEsbEventInstance();
 
           reportCreator.setOomEvent(oomEvent);
           reportCreator.setHighCPULoadEvent(highCPULoadEvent);
-          reportCreator.setHighRequestCountEvent(highRequestCountEvent);
+          reportCreator.setHighRequestCountEvent(highRequestCountEvents);
           reportCreator.setUnresponsiveESBEvent(unresponsiveESBEvent);
 
           oomEvent.addObserver(reportCreator);
           highCPULoadEvent.addObserver(reportCreator);
-          highRequestCountEvent.addObserver(reportCreator);
           unresponsiveESBEvent.addObserver(reportCreator);
+          for(HighRequestCountEvent highRequestCountEvent:highRequestCountEvents){
+              highRequestCountEvent.addObserver(reportCreator);
+          }
+
 
         /**
          * Tasks start here

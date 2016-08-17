@@ -33,6 +33,7 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * Created by Dinanjana on 11/08/2016.
+ * Creates zip archive of files and directories
  */
 public class ZipArchiveCreator {
     private Logger logger = Logger.getLogger(ZipArchiveCreator.class);
@@ -41,6 +42,7 @@ public class ZipArchiveCreator {
     private String sourceFolder = "E:\\Project\\esbMonitor\\EsbMonitor\\ThreadDumps";
 
     public ZipArchiveCreator(String outputZipFile,String sourceFolder){
+        super();
         fileList = new ArrayList<String>();
         this.outputZipFile=outputZipFile;
         this.sourceFolder=sourceFolder;
@@ -54,7 +56,7 @@ public class ZipArchiveCreator {
         try{
             FileOutputStream fos = new FileOutputStream(outputZipFile);
             ZipOutputStream zos = new ZipOutputStream(fos);
-            System.out.println("Output to Zip : " + outputZipFile);
+            logger.info("Output to Zip : " + outputZipFile);
             for(String file : this.fileList){
                 try {
                     logger.info("File Added : " + file);
