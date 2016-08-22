@@ -91,35 +91,49 @@ public class HighRequestCountEvent extends Event {
 
     @Override
     public synchronized String  getValue(){
-        StringBuffer heapNames=new StringBuffer();
-        StringBuffer threadNames=new StringBuffer();
-        String healthDet="";
+        StringBuffer heapNames=new StringBuffer().append("<ol>");
+        StringBuffer threadNames=new StringBuffer().append("<ol>");
+        StringBuffer threadTab=new StringBuffer().append("<ul class=\"tab\">");
+        StringBuffer threadDumpPanel=new StringBuffer();
+        String healthDet="<ol>";
         for(String name:heapDumpsNames){
-            heapNames.append(name + " ,");
+            heapNames.append("<il>"+name + "</il>,");
         }
+        heapNames.append("</ol>");
+
         for (String name:threadDumpsNames){
-            threadNames.append(name+ " ,");
+            threadNames.append("<il>"+name+ "</il>,");
+            threadTab.append("<li><a href=\"#\" class=\"tablinks\" onclick=\"openCity" +
+                             "(event, '"+name+"')\">"+name+"</a></li>");
+            threadDumpPanel.append("<div id=\""+name+"\" class=\"tabcontent\">\n" +
+                                   "  <iframe src=\""+DIR_NAME+"/"+name+"\" width=\"1000\" height=\"200\"></iframe>\n" +
+                                   "</div>");
         }
+        threadNames.append("</ol>");
+        threadTab.append("</ul>");
+
         if(eventConfiguration.isUsedMemory()){
-            healthDet= "\nUsed heap memory :"+ MemoryMonitor.getCurrentUsedMemory()/(1024*1024) +" mb";
+            healthDet= "<il>\nUsed heap memory :"+ MemoryMonitor.getCurrentUsedMemory()/(1024*1024) + " mb</il>";
         }
+
         if(eventConfiguration.isCPULoad()){
-            healthDet=healthDet+"\nCPU load :"+ CPULoadMonitor.getCurrentCPULoad();
+            healthDet=healthDet+"<il>\nCPU load :"+ CPULoadMonitor.getCurrentCPULoad()+"</il>";
         }
+
         if(eventConfiguration.isNetworkLoad()){
-            healthDet=healthDet+"\n HTTP receiver active thread count :" + NetworkFactory.
-                    getPassThruHTTPRecieverInstance().getCurrThreadCount();
-            healthDet=healthDet+"\n HTTPS receiver active thread count :" + NetworkFactory.
-                    getPassThruHTTPSRecieverInstance().getCurrThreadCount();
+            healthDet=healthDet+"<il>\n HTTP receiver active thread count :" + NetworkFactory.
+                    getPassThruHTTPRecieverInstance().getCurrThreadCount()+"</il>";
+            healthDet=healthDet+"<il>\n HTTPS receiver active thread count :" + NetworkFactory.
+                    getPassThruHTTPSRecieverInstance().getCurrThreadCount()+"</il>";
         }
+        healthDet=healthDet+"</ol>";
         Configuration config = Configuration.getInstance();
         Date date = new Date(eventStartTime);
-        String ret = "\n\nHigh request count Event detected at "+ date+" \n"+heapDumpsCreated + " Heap dumps created.Names of them are "+
-                     heapNames.toString()+" Available at :"+ config.getConfigurationBean().getHeapDumpPath()
-                     +"\n"+ threadDumpsCreated + " Thread dumps created. Names of them are "+threadNames.toString() +". Available at :"
-                     +config.getConfigurationBean().getThreadDumpPath()+ "Other parameters collected at the moment of " +
-                     "incident are : "+healthDet;
-
+        String ret = "\n\nPossible High Request Count event detected at "+ date+"<br>\n"+heapDumpsCreated + " Heap dumps created.Names of them are "+
+                     heapNames.toString()+" <br>Available at :"+ config.getConfigurationBean().getHeapDumpPath()
+                     +"<br>\n"+ threadDumpsCreated + " Thread dumps created. Names of them are "+threadNames.toString() +"Available at :"
+                     +eventDir+"/"+DIR_NAME+ "<br>\nOther parameters collected at the moment of " +
+                     "incident are : "+healthDet+threadTab+threadDumpPanel;
         return ret;
     }
 }
