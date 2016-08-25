@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>WSO2 ESB Flight Recorder by dinanjana</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>WSO2 ESB Flight Recorder</h1>
+        <h2>WSO2 ESB Flight Recorder is a tool that can be used to monitor an instance of WSO2 ESB.</h2>
+        <a href="https://github.com/dinanjana/ESBMonitor" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>During past 3 months I was engaged in building java based application to monitoring tool for WSO2 Enterprise Service Bus. This application acts as a flight recorder to the esb. It monitors signs for undesirable changes within the JVM which hosts the esb. Basically it monitors below aspects of the ESB,</p>
+
+<ul>
+<li>Memory usage of ESB</li>
+<li>CPU load of ESB</li>
+<li>Network traffic of ESB</li>
+<li>Responsiveness of ESB
+Also this tool save http/https request load on an embedded Apache Derby db periodically.</li>
+</ul>
+
+<p>User can specify what are the undesirable changes for each fact by changing some values on wso2esbfr.properties file. Those values represent the point at which esb can goes to an undesirable state. Any undesirable change in above variable in ESB will result in triggering an "Event" in this monitoring application. Currently our application supports 4 such events. They are,</p>
+
+<ul>
+<li>Out of memory event</li>
+<li>High CPU load event</li>
+<li>High network traffic event</li>
+<li>Unresponsive esb event</li>
+</ul>
+
+<p>These "Events" contain set of actions which must be performed during such event. Currently our application supports 3 such operations.</p>
+
+<ul>
+<li>Thread dumps generation</li>
+<li>Heap dumps generation</li>
+<li>wso2carbon.log extraction 
+Configuration of these events can be done through changing the values of parameters of properties files that are there for each events. User can configure whether he/she requires any dump generated or if they are generated, how many of them should be generated during the event etc.</li>
+</ul>
+
+<p>When an event occurs our application will generate a report about that particular event stating the details required by the user. Then the application will create a zip archive containing all the required dumps bundled with this report which a user can easily send to get support to analyse the anomaly.</p>
+
+<h2>
+<a id="how-it-works" class="anchor" href="#how-it-works" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How it works?</h2>
+
+<p>Above figure roughly describes the flow inside the WSO2 ESB Flight Recorder</p>
+
+<p>All necessary properties must be set in below property files inside the resources directory inside the directory which has esbMonitor-1.0-SNAPSHOT-jar-with-dependecies.jar file. Among these properties , properties related to trigger WSO2 ESB Flight Recorder also there. For more details on properties read the Read.me file on the repository.</p>
+
+<p>wso2esbfr.properties
+wso2esbfrOOMevent.properties
+wso2esbfrHighCPULoadEvent.properties
+wso2esbfrHighRequestCountEvent.properties
+After setting those properties run the jar file. It will pick up configuration details from those files and will keep them in the memory. During application loading it will start-up "Monitors". These monitors are correspond to monitor many aspects of  ESB instance such as memory usage and cpu load. When values of these properties in ESB instance hit critical levels, ESB Flight recorder will trigger necessary "Events". Set of actions must be done during these events are also set by user through property files. Theses "Events" will take actions according to those configuration. Example for such actions are generate heap dumps, generate thread dumps and generate report on this event.</p>
+
+<p>Finally we have successfully integrated Java Flight Record or simply known as JFR support to this project as well. </p>
+
+<p>This open source project can be found at[1]
+Carbon admin service for ping esb and extract log can be found at[2]
+The list of work done by me can be viewed at below links[3][4]
+<a href="https://github.com/dinanjana/ESBMonitor">https://github.com/dinanjana/ESBMonitor</a>
+<a href="https://github.com/dinanjana/Carbon-component">https://github.com/dinanjana/Carbon-component</a>
+<a href="https://github.com/dinanjana/ESBMonitor/commits/master?author=dinanjana">https://github.com/dinanjana/ESBMonitor/commits/master?author=dinanjana</a>
+<a href="https://github.com/dinanjana/Carbon-component/commits/master?author=dinanjana">https://github.com/dinanjana/Carbon-component/commits/master?author=dinanjana</a>
+Work to be completed</p>
+
+<p>We couldn't finish the WSO2 Carbon Admin service to extract errors printed in the wso2carbo.log file. But hope to complete this minor task in coming weeks as well. However this was not in the original project plan. All the deliverable listed in the proposal are completed.</p>
+
+<p>Finally I would like to thank,
+Google for providing students this great opportunity to collaborate with FOSS communities
+WSO2 for giving me this opportunity to participate in Google Summer of Code Program. Participating in this program helped me learn a lot of new things and to improve my skills.
+My project mentors, Isuru Udana and Chanaka Fernando for selecting me for this project, for the guidance and support extended throughout this period and for helping me to complete this project successfully.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/dinanjana/ESBMonitor/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/dinanjana/ESBMonitor/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/dinanjana/ESBMonitor"></a> is maintained by <a href="https://github.com/dinanjana">dinanjana</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
