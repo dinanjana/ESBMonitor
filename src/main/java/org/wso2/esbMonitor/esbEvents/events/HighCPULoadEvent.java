@@ -30,6 +30,7 @@ import org.wso2.esbMonitor.esbEvents.Event;
 import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
 import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
 import org.wso2.esbMonitor.network.NetworkFactory;
+import org.wso2.esbMonitor.reporting.ReportContent;
 import org.wso2.esbMonitor.utils.ZipArchiveCreator;
 
 import java.io.File;
@@ -110,7 +111,7 @@ public class HighCPULoadEvent extends Event{
         }
     }
 
-    public synchronized String  getValue(){
+    public synchronized ReportContent getValue(){
         StringBuffer heapNames=new StringBuffer().append("<ol>");
         StringBuffer threadNames=new StringBuffer().append("<ol>");
         StringBuffer threadTab=new StringBuffer().append("<ul class=\"tab\">");
@@ -154,7 +155,7 @@ public class HighCPULoadEvent extends Event{
                      +"<br>\n"+ threadDumpsCreated + " Thread dumps created. Names of them are "+threadNames.toString() +"Available at :"
                      +eventDir+"/"+DIR_NAME+ "<br>\nOther parameters collected at the moment of " +
                      "incident are : "+healthDet+threadTab+threadDumpPanel;
-        return ret;
+        return new ReportContent(ret,null);
     }
 //    public String getEventDir() {
 //        return eventDir;

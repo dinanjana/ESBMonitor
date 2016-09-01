@@ -22,6 +22,7 @@ package org.wso2.esbMonitor.esbEvents;
 import org.wso2.esbMonitor.configuration.EventConfiguration;
 import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
+import org.wso2.esbMonitor.reporting.ReportContent;
 import org.wso2.esbMonitor.utils.FileHandler;
 import org.wso2.esbMonitor.utils.ZipArchiveCreator;
 
@@ -74,7 +75,7 @@ public abstract class Event extends Observable{
         zip.zipIt();
     }
 
-    public abstract String getValue();
+    public abstract ReportContent getValue();
 
     public boolean isEventPeriodElapsed(){
         return eventEndtime <= System.currentTimeMillis();

@@ -24,9 +24,12 @@ import org.wso2.esbMonitor.esbEvents.events.HighCPULoadEvent;
 import org.wso2.esbMonitor.esbEvents.events.HighRequestCountEvent;
 import org.wso2.esbMonitor.esbEvents.events.OOMEvent;
 import org.wso2.esbMonitor.esbEvents.events.UnresponsiveESBEvent;
+import org.wso2.esbMonitor.network.NetworkFactory;
+import org.wso2.esbMonitor.network.PassThruHTTPBean;
 import org.wso2.esbMonitor.utils.FileHandler;
 
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -53,39 +56,79 @@ public class ReportCreator implements Observer {
         return instance;
     }
 
+    private byte [] generateReportContent(ReportContent rc){
+        String data0= rc.getMainContent();
+        data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
+        String netTrafficXaxis ="[";
+        String netTrafficYaxis ="[";
+        logger.info("Request queue size :" + NetworkFactory.getPassThruHTTPSRecieverInstance().getLast100networkLoad().size());
+        for(PassThruHTTPBean historyData:NetworkFactory.getPassThruHTTPSRecieverInstance().getLast100networkLoad()){
+            if(historyData== null){
+                netTrafficXaxis=netTrafficXaxis+0+",";
+                netTrafficYaxis=netTrafficYaxis+0+",";
+            }else{
+                netTrafficXaxis=netTrafficXaxis+"\""+historyData.getDate()+"\",";
+                netTrafficYaxis=netTrafficYaxis+historyData.getActiveThreadCount()+",";
+            }
+        }
+        netTrafficXaxis=netTrafficXaxis+"\"0\"]";
+        netTrafficYaxis=netTrafficYaxis+"0]";
+        System.out.println(netTrafficXaxis);
+        data0=data0.replace("TIME_ARRAY",netTrafficXaxis);
+        data0=data0.replace("REQUEST_COUNT_ARRAY",netTrafficYaxis);
+        return data0.getBytes(Charset.forName("UTF-8"));
+    }
+
     @Override
     public synchronized void update(Observable o, Object arg) {
         logger.info("Notification received");
         if(o==oomEvent && o instanceof OOMEvent){
             logger.info("OOM Event notified");
-            String data0=((OOMEvent) o).getValue();
-            data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
-            byte[] data=data0.getBytes(Charset.forName("UTF-8"));
+            ReportContent rc = ((OOMEvent) o).getValue();
+//            String data0= rc.getMainContent();
+//            data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
+//            String netTrafficXaxis ="[";
+//            String netTrafficYaxis ="[";
+//            logger.info("Request queue size :" + NetworkFactory.getPassThruHTTPSRecieverInstance().getLast100networkLoad().size());
+//            for(PassThruHTTPBean historyData:NetworkFactory.getPassThruHTTPSRecieverInstance().getLast100networkLoad()){
+//                if(historyData== null){
+//                    netTrafficXaxis=netTrafficXaxis+0+",";
+//                    netTrafficYaxis=netTrafficYaxis+0+",";
+//                }else{
+//                    netTrafficXaxis=netTrafficXaxis+"\""+historyData.getDate()+"\",";
+//                    netTrafficYaxis=netTrafficYaxis+historyData.getActiveThreadCount()+",";
+//                }
+//            }
+//            netTrafficXaxis=netTrafficXaxis+"\"0\"]";
+//            netTrafficYaxis=netTrafficYaxis+"0]";
+//            System.out.println(netTrafficXaxis);
+//            data0=data0.replace("TIME_ARRAY",netTrafficXaxis);
+//            data0=data0.replace("REQUEST_COUNT_ARRAY",netTrafficYaxis);
+//            byte[] data=data0.getBytes(Charset.forName("UTF-8"));
+            byte [] data = generateReportContent(rc);
             FileHandler.writeFile(((OOMEvent) o).getEventDir()+"/Report.html", data);
         }
         else if(o==highCPULoadEvent && o instanceof HighCPULoadEvent){
             logger.info("Notified observer");
-            String data0=((HighCPULoadEvent) o).getValue();
-            data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
-            byte[] data=data0.getBytes(Charset.forName("UTF-8"));
+            ReportContent rc =((HighCPULoadEvent) o).getValue();
+            byte[] data=generateReportContent(rc);
             FileHandler.writeFile(((HighCPULoadEvent) o).getEventDir()+"/Report.html", data);
         }
 
         else if(o==unresponsiveESBEvent && o instanceof UnresponsiveESBEvent){
             logger.info("Notified observer");
-            String data0=((UnresponsiveESBEvent) o).getValue();
-            data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
-            byte[] data=data0.getBytes(Charset.forName("UTF-8"));
+            ReportContent rc =((UnresponsiveESBEvent) o).getValue();
+            byte[] data=generateReportContent(rc);
             FileHandler.writeFile(((UnresponsiveESBEvent) o).getEventDir()+"/Report.html", data);
         }else {
             if(o instanceof HighRequestCountEvent){
                 logger.info("Notified observer on high request count");
                 for (HighRequestCountEvent highRequestCountEvent:highRequestCountEvents){
                     if(o==highRequestCountEvent){
-                        String data0=((HighRequestCountEvent) o).getValue();
-                        data0=reportTemplate.getReportTemplate().replace("EVENT_DESCRIPTION",data0);
-                        byte[] data=data0.getBytes(Charset.forName("UTF-8"));
+                        ReportContent rc = ((HighRequestCountEvent) o).getValue();
+                        byte[] data=generateReportContent(rc);
                         FileHandler.writeFile(((HighRequestCountEvent) o).getEventDir()+"/Report.html", data);
+                        break;
                     }
                 }
             }

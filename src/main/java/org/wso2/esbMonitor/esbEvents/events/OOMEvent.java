@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.configuration.Configuration;
 import org.wso2.esbMonitor.configuration.EventConfiguration;
 import org.wso2.esbMonitor.connector.ConnectorFactory;
+import org.wso2.esbMonitor.dumpHandlers.DumpCreatorFactory;
 import org.wso2.esbMonitor.dumpHandlers.HeapDumper;
 import org.wso2.esbMonitor.dumpHandlers.JFRDumper;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
@@ -31,6 +32,7 @@ import org.wso2.esbMonitor.esbEvents.Event;
 import org.wso2.esbMonitor.jvmDetails.CPULoadMonitor;
 import org.wso2.esbMonitor.jvmDetails.MemoryMonitor;
 import org.wso2.esbMonitor.network.NetworkFactory;
+import org.wso2.esbMonitor.reporting.ReportContent;
 import org.wso2.esbMonitor.utils.ZipArchiveCreator;
 
 import java.io.File;
@@ -72,8 +74,9 @@ public class OOMEvent extends Event {
         logger.info("New OOM event started.Ends on " + getEventEndTime() +
                     " Maximum of " + maxNumOfThreadDumps + " and maximum of " + maxNumOfHeapDumps
                     + " will be created.");
-        String path=new File("./").getAbsolutePath();
-        new JFRDumper().createJFR(eventPeriod/1000,path+"/"+eventDir+"/jfr1.jfr");
+        if(eventConfiguration.isCreateJFR()){
+            DumpCreatorFactory.getJFRDumperInstance().createJFR(eventPeriod/1000,eventConfiguration.getJfrPath()+"/"+eventDir+".jfr");
+        }
     }
 
     /**This method is called
@@ -100,7 +103,7 @@ public class OOMEvent extends Event {
         }
     }
 
-    public synchronized String  getValue(){
+    public synchronized ReportContent getValue(){
         StringBuffer heapNames=new StringBuffer().append("<ol>");
         StringBuffer threadNames=new StringBuffer().append("<ol>");
         StringBuffer threadTab=new StringBuffer().append("<ul class=\"tab\">");
@@ -145,7 +148,7 @@ public class OOMEvent extends Event {
                      +"<br>\n"+ threadDumpsCreated + " Thread dumps created. Names of them are "+threadNames.toString() +"Available at :"
                      +eventDir+"/"+DIR_NAME+ "<br>\nOther parameters collected at the moment of " +
                      "incident are : "+healthDet+threadTab+threadDumpPanel;
-        return ret;
+        return new ReportContent(ret,null);
     }
 
 //    public String getEventDir() {

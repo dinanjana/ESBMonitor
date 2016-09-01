@@ -26,7 +26,11 @@ import org.wso2.esbMonitor.connector.ConnectorFactory;
 import org.wso2.esbMonitor.dumpHandlers.ThreadDumpCreator;
 import org.wso2.esbMonitor.esbEvents.events.EventFactory;
 import org.wso2.esbMonitor.network.NetworkFactory;
+import org.wso2.esbMonitor.network.PassThruHTTPBean;
 import org.wso2.esbMonitor.network.PassThruHTTPSenderAndReciever;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Dinanjana on 29/05/2016.
@@ -74,9 +78,9 @@ public class NetworkMonitor extends Thread {
         initTask();
         while (true){
             passThruHTTPSender.getMbeanInfo();
-//            passThruHTTPReciever.getMbeanInfo();
-//            passThruHTTPSSender.getMbeanInfo();
-//            passThruHTTPSReciever.getMbeanInfo();
+            passThruHTTPReciever.getMbeanInfo();
+            passThruHTTPSSender.getMbeanInfo();
+            passThruHTTPSReciever.getMbeanInfo();
             try {
                 Thread.sleep(waitTime);
             } catch (InterruptedException e) {

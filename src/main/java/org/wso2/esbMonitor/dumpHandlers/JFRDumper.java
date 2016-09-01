@@ -19,12 +19,10 @@
 
 package org.wso2.esbMonitor.dumpHandlers;
 
-import com.sun.management.DiagnosticCommandMBean;
 import org.apache.log4j.Logger;
 import org.wso2.esbMonitor.connector.ConnectorFactory;
 
 import javax.management.InstanceNotFoundException;
-import javax.management.JMX;
 import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -34,16 +32,15 @@ import java.io.IOException;
 /**
  * Created by Dinanjana on 22/08/2016.
  */
-public class JFRDumper {
+public class JFRDumper{
     private Logger logger= Logger.getLogger(JFRDumper.class);
     /** Object Name of DiagnosticCommandMBean. */
     public final static String DIAGNOSTIC_COMMAND_MBEAN_NAME =
             "com.sun.management:type=DiagnosticCommand";
     /** Platform MBean Server. */
     private ObjectName objectName;
-    private DiagnosticCommandMBean diagnosticCommandMBean;
 
-    public JFRDumper(){
+    protected JFRDumper(){
         try {
             this.objectName=new ObjectName(DIAGNOSTIC_COMMAND_MBEAN_NAME);
         } catch (MalformedObjectNameException e) {
@@ -51,7 +48,13 @@ public class JFRDumper {
         }
     }
 
-    public void createJFR(long time,String path){
+    /**
+     * Sends remote jvm a request to create a JFR
+     * @param time in seconds
+     * @param  path Location of JFR to be saved*/
+
+    public synchronized void createJFR(long time,String path){
+        logger.info("JFR path :" + path);
         String commandLineArgument = String.format("delay=0s compress=true duration=%ds filename=\"%s\"", time,path);
         try {
             logger.info("Creating JFR");
@@ -62,9 +65,9 @@ public class JFRDumper {
         } catch (ReflectionException e) {
             logger.error("Error" ,e);
         } catch (InstanceNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Error:" ,e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error", e);
         }
     }
 

@@ -27,7 +27,9 @@ import org.wso2.esbMonitor.persistance.PersistenceServiceFactory;
 
 import javax.management.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Dinanjana on 29/05/2016.
@@ -46,6 +48,7 @@ public class PassThruHTTPSenderAndReciever {
     private HighRequestCountEvent event;
     private int currThreadCount;
     private int currQueueSize;
+    private List<PassThruHTTPBean> last100networkLoad = new ArrayList<>();
 
     public PassThruHTTPSenderAndReciever(String bean,RemoteConnector remote){
         this.bean = bean;
@@ -110,6 +113,9 @@ public class PassThruHTTPSenderAndReciever {
             }
             logger.info("Adding network event to scheduledList");
             PersistenceServiceFactory factory = new PersistenceServiceFactory();
+            if(last100networkLoad.size() >= 100)
+                last100networkLoad.remove(0);
+            last100networkLoad.add(passThruHTTPBean);
             factory.getPersistenceServiceInstance().addNetworkEvent(passThruHTTPBean);
 
         } catch (MBeanException e) {
@@ -147,5 +153,9 @@ public class PassThruHTTPSenderAndReciever {
 
     public int getCurrThreadCount() {
         return this.currThreadCount;
+    }
+
+    public List<PassThruHTTPBean> getLast100networkLoad() {
+        return last100networkLoad;
     }
 }

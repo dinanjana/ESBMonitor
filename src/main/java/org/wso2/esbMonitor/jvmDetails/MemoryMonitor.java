@@ -106,7 +106,7 @@ public class MemoryMonitor extends JVMDetails{
     }
 
     public synchronized String  getValue(){
-        return oomEvent.getValue();
+        return null;
     }
 
     public void setMemory(double memory) {

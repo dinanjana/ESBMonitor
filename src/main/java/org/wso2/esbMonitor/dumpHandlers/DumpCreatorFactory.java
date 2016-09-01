@@ -27,12 +27,20 @@ import org.wso2.esbMonitor.connector.ConnectorFactory;
  */
 public class DumpCreatorFactory {
     private static ThreadDumpCreator threadDumpCreator=null;
+    private  static JFRDumper jfrDumper=null;
 
     public static ThreadDumpCreator getThreadDumpCreator(){
-        if(threadDumpCreator != null){
+        if(threadDumpCreator == null){
             ConnectorFactory conn = new ConnectorFactory();
             threadDumpCreator=new ThreadDumpCreator(Configuration.getInstance(),conn.getRemoteConnectorInstance());
         }
         return threadDumpCreator;
+    }
+
+    public static JFRDumper getJFRDumperInstance(){
+        if(jfrDumper==null){
+            jfrDumper=new JFRDumper();
+        }
+        return jfrDumper;
     }
 }

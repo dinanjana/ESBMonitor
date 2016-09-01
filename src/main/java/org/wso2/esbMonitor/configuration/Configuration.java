@@ -137,10 +137,10 @@ public class Configuration {
             logger.info("Added DB cleaner task wait time "+ configurationBean.getDbCleanerTask());
         }
 
-        if(prop.getProperty("THREAD_DUMP_PATH") != null){
-            instance.configurationBean.setThreadDumpPath(prop.getProperty("THREAD_DUMP_PATH"));
-            logger.info("Added thread dump path" + configurationBean.getThreadDumpPath());
-        }
+//        if(prop.getProperty("THREAD_DUMP_PATH") != null){
+//            instance.configurationBean.setThreadDumpPath(prop.getProperty("THREAD_DUMP_PATH"));
+//            logger.info("Added thread dump path" + configurationBean.getThreadDumpPath());
+//        }
 
         if(prop.getProperty("PING_RECEIVING_PORT") != null){
             instance.configurationBean.setPingReceivingPort(Integer.parseInt(prop.getProperty("PING_RECEIVING_PORT")));

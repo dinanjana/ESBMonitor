@@ -78,7 +78,7 @@ public class FileHandler {
     }
 
     public static String readFile(String fileName){
-        Charset charset = Charset.forName("US-ASCII");
+        Charset charset = Charset.forName("UTF-8");
         Path file = Paths.get(fileName);
         String line = null;
         try (BufferedReader reader = Files.newBufferedReader(file, charset)) {
@@ -86,8 +86,9 @@ public class FileHandler {
             while ((line1 = reader.readLine()) != null) {
                 line=line+line1;
             }
+            logger.info("File read complete");
         } catch (IOException x) {
-            System.err.format("IOException: %s%n", x);
+            logger.error("IOException: %s%n", x);
         }
         return line;
     }

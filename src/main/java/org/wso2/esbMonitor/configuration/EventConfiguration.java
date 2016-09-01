@@ -43,6 +43,8 @@ public class EventConfiguration {
     private boolean isUsedMemory=false;
     private boolean isCPULoad=false;
     private boolean isNetworkLoad=false;
+    private boolean createJFR=false;
+    private String jfrPath="./";
     private Properties properties;
 
     public EventConfiguration(ESBStatus eventName,String eventConfigFileName){
@@ -105,7 +107,23 @@ public class EventConfiguration {
             isNetworkLoad = Boolean.parseBoolean(prop.getProperty("IS_NETWORK_LOAD"));
             logger.info("Added is network load required for "+eventName+"= " +isNetworkLoad());
         }
+        if(prop.getProperty("CREATE_JFR")!=null){
+            createJFR= Boolean.parseBoolean(prop.getProperty("CREATE_JFR"));
+            logger.info("Added create JFR= " + createJFR);
+        }
+        if(prop.getProperty("JFR_PATH")!=null){
+            jfrPath=prop.getProperty("JFR_PATH");
+            logger.info("JFR location added: "+jfrPath);
+        }
 
+    }
+
+    public String getJfrPath(){
+        return this.jfrPath;
+    }
+
+    public boolean isCreateJFR() {
+        return createJFR;
     }
 
     public int getMaxThreadDumps() {

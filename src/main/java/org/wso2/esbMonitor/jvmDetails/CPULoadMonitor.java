@@ -60,6 +60,11 @@ public class CPULoadMonitor extends JVMDetails {
         highCPULoadEvent= EventFactory.getHighCPULoadEventInstance();
     }
 
+    @Override
+    String getValue() {
+        return null;
+    }
+
 
     private void checkWarningUsage(ObjectName mbean) {
         OperatingSystemMXBean operatingSystemMXBean=
@@ -86,10 +91,10 @@ public class CPULoadMonitor extends JVMDetails {
 
     }
 
-    @Override
-    public synchronized String  getValue(){
-        return highCPULoadEvent.getValue();
-    }
+
+//    public synchronized String  getValue(){
+//        return highCPULoadEvent.getValue();
+//    }
 
     public synchronized static double getCurrentCPULoad(){
         return currentCPULoad;
