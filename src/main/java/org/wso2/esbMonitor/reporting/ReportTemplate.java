@@ -39,7 +39,8 @@ public class ReportTemplate {
     }
 
     private ReportTemplate(){
-        this.reportTemplate= FileHandler.readFile("E:\\Project\\esbMonitor\\EsbMonitor\\src\\main\\resources\\reportTemplate\\template.html");
+        //this.reportTemplate = getClass().getClassLoader().getResource("reportTemplate/template.html");
+        this.reportTemplate= FileHandler.readFile("reportTemplate/template.html");
     }
 
     public String getReportTemplate(){

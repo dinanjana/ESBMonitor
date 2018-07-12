@@ -30,7 +30,7 @@ public class ConfigurationBean {
     private long networkTask = 3000;
     private String heapDumpPath;
     private String emailAddress;
-    private Double memoryUsage = 0.7;
+    private Double memoryUsage = 0.02;
     private Double cpuUsage = 0.7;
     private int httpRequests = 0;
     private int maxReqestqueueSize = 0;

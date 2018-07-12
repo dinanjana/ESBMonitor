@@ -55,7 +55,7 @@ public class RemoteConnector {
         try {
             connect();
         } catch (MalformedURLException e) {
-            logger.error(e.getStackTrace());
+            logger.error("Error", e);
         } catch (IOException e) {
             logger.error("IO error in connecting",e);
             try {
@@ -70,6 +70,7 @@ public class RemoteConnector {
     }
 
     private synchronized void connect() throws IOException {
+        logger.info(jmxurl);
         JMXServiceURL target = new JMXServiceURL(jmxurl);
         //for passing credentials for password
         Map<String, String[]> env = new HashMap<String, String[]>();

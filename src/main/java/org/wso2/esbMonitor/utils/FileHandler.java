@@ -19,6 +19,7 @@
 
 package org.wso2.esbMonitor.utils;
 
+import java.io.InputStreamReader;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -79,9 +80,10 @@ public class FileHandler {
 
     public static String readFile(String fileName){
         Charset charset = Charset.forName("UTF-8");
-        Path file = Paths.get(fileName);
+        //Path file = Paths.get(fileName);
+        InputStreamReader isr = new InputStreamReader(FileHandler.class.getClassLoader().getResourceAsStream(fileName));
         String line = null;
-        try (BufferedReader reader = Files.newBufferedReader(file, charset)) {
+        try (BufferedReader reader = new BufferedReader(isr)) {
             String line1=null;
             while ((line1 = reader.readLine()) != null) {
                 line=line+line1;

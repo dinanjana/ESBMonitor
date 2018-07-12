@@ -33,9 +33,9 @@ import java.util.*;
  */
 public class Configuration {
     private Logger logger = Logger.getLogger(Configuration.class);
-    private final String FILE_NAME = "./wso2esbfr.properties";
+    private final String FILE_NAME = "wso2esbfr.properties";
     private ConfigurationBean configurationBean;
-    private String jmxurl ="service:jmx:rmi://localhost:11111/jndi/rmi://localhost:9999/jmxrmi";
+    private String jmxurl ="service:jmx:rmi:///jndi/rmi://127.0.0.1:11111/jmxrmi";
     private String username ="admin";
     private String password ="admin";
     private Map<ESBStatus,EventConfiguration> eventConfigurations = new HashMap<>();
@@ -99,7 +99,7 @@ public class Configuration {
 
         if(prop.getProperty("MAX_MEMORY_USAGE")!= null){
             instance.configurationBean.setMemoryUsage(Double.parseDouble(prop.getProperty("MAX_MEMORY_USAGE")));
-            logger.info("Added max memory usage "+ configurationBean.getEmailAddress());
+            logger.info("Added max memory usage "+ configurationBean.getMemoryUsage());
         }
 
         if(prop.getProperty("MAX_CPU_USAGE")!=null){
@@ -151,13 +151,13 @@ public class Configuration {
             instance.configurationBean.setPingDelay(Long.parseLong(prop.getProperty("PING_DELAY")));
             logger.info("Added ping delay " + configurationBean.getPingDelay());
         }
-        EventConfiguration eventConfiguration = new EventConfiguration(ESBStatus.OOM_EVENT,"./wso2esbfrOOMevent.properties");
+        EventConfiguration eventConfiguration = new EventConfiguration(ESBStatus.OOM_EVENT,"wso2esbfrOOMevent.properties");
         instance.eventConfigurations.put(ESBStatus.OOM_EVENT,eventConfiguration);
-        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_CPU_LOAD,"./wso2esbfrHIGHCPULoadEvent.properties");
+        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_CPU_LOAD,"wso2esbfrHIGHCPULoadEvent.properties");
         instance.eventConfigurations.put(ESBStatus.HIGH_CPU_LOAD,eventConfiguration);
-        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_REQUEST_COUNT,"./wso2esbfrHighRequestCountEvent.properties");
+        eventConfiguration = new EventConfiguration(ESBStatus.HIGH_REQUEST_COUNT,"wso2esbfrHighRequestCountEvent.properties");
         instance.eventConfigurations.put(ESBStatus.HIGH_REQUEST_COUNT,eventConfiguration);
-        eventConfiguration = new EventConfiguration(ESBStatus.UNRESPONSIVE_ESB,"./wso2esbfrUnresponsiveESBEvent.properties");
+        eventConfiguration = new EventConfiguration(ESBStatus.UNRESPONSIVE_ESB,"wso2esbfrUnresponsiveESBEvent.properties");
         instance.eventConfigurations.put(ESBStatus.UNRESPONSIVE_ESB,eventConfiguration);
     }
 

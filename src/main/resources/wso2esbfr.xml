@@ -34,14 +34,14 @@
         <PING_RECEIVING_PORT>9090</PING_RECEIVING_PORT>
         <PING_DELAY>3000</PING_DELAY>
     </main>
-    <event name="OOMEvent" CREATE_HEAP_DUMPS="false" CREATE_THREAD_DUMPS="false" IS_USED_MEMORY="false"
-           IS_CPU_LOAD="false" IS_NETWORK_LOAD="false" >
+    <event name="OOMEvent" CREATE_HEAP_DUMPS="true" CREATE_THREAD_DUMPS="true" IS_USED_MEMORY="true"
+           IS_CPU_LOAD="true" IS_NETWORK_LOAD="false" >
         <MAX_HEAP_DUMPS>3</MAX_HEAP_DUMPS>
         <MAX_THREAD_DUMPS>6</MAX_THREAD_DUMPS>
         <EVENT_PERIOD>4999</EVENT_PERIOD>
     </event>
-    <event name="HighCPULoadEvent"  CREATE_HEAP_DUMPS="false" CREATE_THREAD_DUMPS="false" IS_USED_MEMORY="false"
-           IS_CPU_LOAD="false" IS_NETWORK_LOAD="false">
+    <event name="HighCPULoadEvent"  CREATE_HEAP_DUMPS="true" CREATE_THREAD_DUMPS="true" IS_USED_MEMORY="true"
+           IS_CPU_LOAD="true" IS_NETWORK_LOAD="false">
         <MAX_HEAP_DUMPS>3</MAX_HEAP_DUMPS>
         <MAX_THREAD_DUMPS>6</MAX_THREAD_DUMPS>
         <EVENT_PERIOD>4999</EVENT_PERIOD>

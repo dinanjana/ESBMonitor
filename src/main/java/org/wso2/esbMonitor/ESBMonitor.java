@@ -99,12 +99,12 @@ public class ESBMonitor {
           NetworkMonitor networkMonitor = taskFactory.getNetworkMonitorInstance();
           DBTaskRunner dbTaskRunner = taskFactory.getDbTaskRunnerInstance();
           DBCleanerTask dbCleanerTask= taskFactory.getDbCleanerTaskInstance();
-          ESBStatusCheckerTask esbStatusCheckerTask = taskFactory.getEsbStatusCheckerTaskInstance();
+          //ESBStatusCheckerTask esbStatusCheckerTask = taskFactory.getEsbStatusCheckerTaskInstance();
           jvmTaskRunner.start();
           networkMonitor.start();
           dbTaskRunner.start();
           dbCleanerTask.start();
-          esbStatusCheckerTask.start();
+          //esbStatusCheckerTask.start();
 
 
     }
